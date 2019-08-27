@@ -1,5 +1,3 @@
-import org.json.JSONObject;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,14 +28,14 @@ public class EventAPI extends HttpServlet {
             BufferedReader reader = req.getReader();
             while ((line = reader.readLine()) != null)
                 jb.append(line);
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Error: " + ex);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error: " + e);
         }
 
-        JSONObject json = new JSONObject(jb.toString());
+        // TODO : physically download external libraries and add them to WEB-INF ?
+        // JSONObject json = new JSONObject(jb.toString());
 
-        // Print out the contents of challenge
-        System.out.println(json.get("challenge"));
+        // System.out.println(json.get("challenge"));
 
 
     }
