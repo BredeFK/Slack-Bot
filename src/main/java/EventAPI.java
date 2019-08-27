@@ -1,3 +1,5 @@
+import com.google.gson.GsonBuilder;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -32,12 +34,11 @@ public class EventAPI extends HttpServlet {
             logger.log(Level.WARNING, "Error: " + e);
         }
 
-        // TODO : physically download external libraries and add them to WEB-INF ?
-        // JSONObject json = new JSONObject(jb.toString());
+        // Convert json string to object
+        if (req.getContentType().toLowerCase().contains("json")) {
+            SlackEvent event = new GsonBuilder().create().fromJson(jb.toString(), SlackEvent.class);
 
-        // System.out.println(json.get("challenge"));
-
-
+            System.out.println(event.toString());
+        }
     }
-
 }

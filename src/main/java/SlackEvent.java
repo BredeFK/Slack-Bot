@@ -30,4 +30,14 @@ public class SlackEvent {
     public void setType(String type) {
         this.type = type;
     }
+
+    // Return string in json format
+    @Override
+    public String toString() {
+        return '{' +
+                "\n\t\"token\": \"" + token +
+                "\",\n\t\"challenge\": \"" + challenge +
+                "\",\n\t\"type\": \"" + type +
+                "\"\n}";
+    }
 }
