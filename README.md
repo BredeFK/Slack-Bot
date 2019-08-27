@@ -10,3 +10,6 @@ This will be a bot in slack driven on java code.
 ## Dependencies
 * Gson
 * Javax servlet-api
+
+## Ops
+* Might have to drag the external library .jars to the `web\WEB-INF\lib` folders. I will check this out later
