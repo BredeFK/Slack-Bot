@@ -15,10 +15,6 @@ import java.util.logging.Logger;
 public class EventAPI extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventAPI.class.getName());
 
-    public static void main(String[] args) {
-        System.out.println("Test");
-    }
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.getWriter().write("GET method is not supported for this URL");
