@@ -1,4 +1,3 @@
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.servlet.ServletException;
@@ -33,28 +32,14 @@ public class EventAPI extends HttpServlet {
                 jb.append(line);
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error: " + ex);
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
         }
 
-        // Try to get body in jsonobject
-        JSONObject json = null;
-        try {
-            json = new JSONObject(jb.toString());
-        } catch (JSONException ex) {
-            logger.log(Level.WARNING, "Error: " + ex);
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
+        JSONObject json = new JSONObject(jb.toString());
 
-        // Check if challenge exists
-        if (!json.get("challenge").equals("")) {
-            // Respond with challenge and status ok
-            System.out.println(req.getHeader("X-Slack-Signature"));
-            System.out.println(req.getHeader("X-Slack-Request-Timestamp"));
-            resp.setContentType("test/plain");
-            resp.getWriter().write(json.get("challenge").toString());
-            resp.setStatus(HttpServletResponse.SC_OK);
-        }
+        // Print out the contents of challenge
+        System.out.println(json.get("challenge"));
+
+
     }
+
 }
