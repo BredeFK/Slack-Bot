@@ -1,1 +1,1 @@
-web: java -jar alfred.war
+web: java -jar target/dependency/webapp-runner.jar target/*.jar
