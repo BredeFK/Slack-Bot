@@ -1,3 +1,5 @@
+package DailyQuote;
+
 import java.util.ArrayList;
 
 public class Content {
@@ -13,16 +15,5 @@ public class Content {
 
     public ArrayList<Quote> getQuotes() {
         return quotes;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder output = new StringBuilder("\"copyright\": \"" + copyright + "\",\n");
-
-        for (Quote quote : quotes) {
-            output.append(quote.toString());
-        }
-
-        return output.toString();
     }
 }

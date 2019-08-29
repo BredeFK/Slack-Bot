@@ -1,16 +1,18 @@
+package DailyQuote;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class QuoteOfTheDay {
+public class DailyQuote {
 
     private Error error;
     private Content contents;
     private String channelID;
-    private static final Logger logger = Logger.getLogger(EventAPI.class.getName());
+    private static final Logger logger = Logger.getLogger(DailyQuote.class.getName());
 
-    public QuoteOfTheDay() {
+    public DailyQuote() {
 
     }
 
@@ -25,12 +27,6 @@ public class QuoteOfTheDay {
     public Content getContents() {
         return contents;
     }
-
-    @Override
-    public String toString() {
-        return contents.toString();
-    }
-
 
     // Converts object to formatted json that can be sent to Slacks "Block Kit Builder" https://api.slack.com/tools/block-kit-builder
     public String toJson() {

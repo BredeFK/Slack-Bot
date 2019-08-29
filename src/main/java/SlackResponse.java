@@ -1,10 +1,10 @@
 // POSTMessageResponse is a class for returned response when posting message
-public class POSTMessageResponse {
+public class SlackResponse {
     private boolean ok;
     private String error;
     private String warning;
 
-    public POSTMessageResponse() {
+    public SlackResponse() {
 
     }
 

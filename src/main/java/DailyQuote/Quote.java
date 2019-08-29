@@ -1,3 +1,5 @@
+package DailyQuote;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,14 +60,5 @@ public class Quote {
 
     public String getId() {
         return id;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder output = new StringBuilder("\"quote\": \"" + quote + "\",\n" +
-                "\"length\": \"" + length + "\",\n" +
-                "\"author\": \"" + author + "\",");
-
-        return output.toString();
     }
 }

@@ -1,3 +1,5 @@
+package DailyQuote;
+
 public class Error {
 
     private int code;
