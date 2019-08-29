@@ -42,7 +42,7 @@ public class Message extends HttpServlet {
 
                 // Try to send message with POST
                 response = Unirest.post("https://slack.com/api/chat.postMessage")
-                        .header("content-type", "application/json")
+                        .header("content-type", "application/json; charset=utf-8")
                         .header("Authorization", "Bearer " + envVars.getTOKEN())
                         .body(quote.toJson())
                         .asJson();
