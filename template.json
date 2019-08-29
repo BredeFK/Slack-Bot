@@ -1,0 +1,30 @@
+{
+  "channel": "<ChannelID>",
+  "attachments": [
+    {
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "_<quote>_\n\n- *<Author>*"
+          },
+          "accessory": {
+            "type": "image",
+            "image_url": "<imageURL>",
+            "alt_text": "quote-<category>"
+          }
+        },
+        {
+          "type": "context",
+          "elements": [
+            {
+              "type": "mrkdwn",
+              "text": "*Last updated:* <date>\n:copyright: <copyright>\n"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

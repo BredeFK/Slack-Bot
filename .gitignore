@@ -42,3 +42,6 @@ buildNumber.properties
 alfred.iml
 out/
 
+#Environment variables
+.env
+
