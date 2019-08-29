@@ -5,7 +5,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,11 +21,14 @@ public class Message extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // TODO : get path to .env file more dynamically
-        Dotenv dotenv = Dotenv.configure().directory("C:\\Users\\BredeKlausen\\OneDrive - ITverket AS\\Dokumenter\\Kompetanseheving\\Java\\alfred\\").load();
+        // Get environment variables
+        EnvVars envVars = new EnvVars();
 
         // Get the quote of the day
-        DailyQuote quote = getQuoteOfTheDay(dotenv.get("CHANNEL-ID-GENERAL"));
+        DailyQuote quote = getQuoteOfTheDay();
+
+        // Set to correct channelID
+        quote.setChannelID(envVars.getChannelGeneral());
 
         // Only proceed if there are no errors
         if (quote.getError() == null) {
@@ -41,7 +43,7 @@ public class Message extends HttpServlet {
                 // Try to send message with POST
                 response = Unirest.post("https://slack.com/api/chat.postMessage")
                         .header("content-type", "application/json")
-                        .header("Authorization", "Bearer " + dotenv.get("SLACK-BOT-TOKEN"))
+                        .header("Authorization", "Bearer " + envVars.getTOKEN())
                         .body(quote.toJson())
                         .asJson();
             } catch (UnirestException e) {
@@ -81,7 +83,7 @@ public class Message extends HttpServlet {
     }
 
     // getQuoteOfTheDay returns the quote of the day in an object
-    private DailyQuote getQuoteOfTheDay(String channelID) {
+    private DailyQuote getQuoteOfTheDay() {
 
         HttpResponse<JsonNode> response = null;
         try {
