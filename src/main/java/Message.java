@@ -61,7 +61,7 @@ public class Message extends HttpServlet {
             }
 
             // Check for warnings and log them
-            if (msgResponse.getWarning() == null || !msgResponse.getWarning().isEmpty()) {
+            if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
                 logger.log(Level.WARNING, "Warning : " + msgResponse.getWarning());
             }
 
