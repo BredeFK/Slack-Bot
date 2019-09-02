@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 public class Message extends HttpServlet {
     private static final Logger logger = Logger.getLogger(Message.class.getName());
 
+    // TODO function triggers twice when deploying
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // Get environment variables
