@@ -9,6 +9,9 @@ build:
 run:
 	screen sudo docker container run -p 80:8080 -it alfred
 
+status:
+	docker container ls
+
 clean:
 	git pull
 	mvn clean install
