@@ -15,9 +15,9 @@ EXPOSE 8080
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Copy
-COPY ./target/alfred-1.9.jar /usr/local/tomcat/webapps/ROOT.jar
+COPY ./target/alfred-1.9.war /usr/local/tomcat/webapps/ROOT.war
 
-#VM argument
+#Environment variables
 ENV SLACK-BOT-TOKEN=""
 ENV CHANNEL-ID-GENERAL=""
 
