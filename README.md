@@ -11,12 +11,17 @@ This will be a bot in slack driven on java code.
 * Gson
 * Javax servlet-api
 
-## Deployment (Still in progress!)
+## Deployment (Still in progress!) can also use make after setting variables
 1. Clone this repository `git clone https://gitlab.com/BredeFK/alfred.git`
 2. Open `Dockerfile` and add the two environment variables `SLACK-BOT-TOKEN` and `CHANNEL-ID-GENERAL`
 3. Run maven in root directory `mvn clean install`
 4. Build Docker image `sudo docker image build -t alfred .`
 5. Deploy app `screen sudo docker container run -p 80:8080 -it alfred`
+
+### Makefile
+* make build
+* make clean
+* make run
 
 ## Managing deployment
 * To check logs on running deployment `screen -r`
