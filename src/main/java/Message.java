@@ -12,19 +12,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @WebServlet("/message")
 public class Message extends HttpServlet {
     private static final Logger logger = Logger.getLogger(Message.class.getName());
+    // Get environment variables
+    EnvVars envVars = new EnvVars();
 
-    // TODO function triggers twice when deploying
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Get environment variables
-        EnvVars envVars = new EnvVars();
 
         // Get the quote of the day
         DailyQuote quote = getQuoteOfTheDay();
@@ -81,8 +79,14 @@ public class Message extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.log(Level.INFO, "POST method was attempted");
-        logger.log(Level.INFO, req.getHeaderNames().toString() + "\n\n" + req.getParameter("token") + "  " + req.getParameter("user_name")  + "  " + req.getParameter("text"));
-        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+        // Verify post request
+        if (req.getParameter("command").contains("/quote") && !req.getHeader("X-Slack-Signature").isEmpty() && req.getParameter("channel_id").contains(envVars.getChannelGeneral())) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        }
+
     }
 
     // getQuoteOfTheDay returns the quote of the day in an object
