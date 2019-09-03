@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,6 +81,7 @@ public class Message extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.log(Level.INFO, "POST method was attempted");
+        logger.log(Level.INFO, req.getHeaderNames().toString() + "\n\n" + req.getParameter("token") + "  " + req.getParameter("user_name")  + "  " + req.getParameter("text"));
         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 
