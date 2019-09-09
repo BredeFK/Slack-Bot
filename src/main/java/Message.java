@@ -19,6 +19,9 @@ import java.util.logging.Logger;
 public class Message extends HttpServlet {
     private static final Logger logger = Logger.getLogger(Message.class.getName());
 
+    // Get environment variables
+    private EnvVars envVars = new EnvVars();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.log(Level.INFO, "GET method was attempted");
@@ -32,68 +35,178 @@ public class Message extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.log(Level.INFO, "POST method was attempted");
 
-        // Get environment variables
-        EnvVars envVars = new EnvVars();
 
-        // Verify post request
-        if (req.getParameter("command").contains("/quote") && !req.getHeader("X-Slack-Signature").isEmpty() && req.getParameter("channel_id").contains(envVars.getChannelGeneral())) {
+        if (!req.getHeader("X-Slack-Signature").isEmpty() && req.getParameter("channel_id").contains(envVars.getChannelGeneral())) {
 
-            // Get the quote of the day
-            DailyQuote quote = getQuoteOfTheDay();
+            // get command and remove whitespace
+            String command = req.getParameter("command").replaceAll("\\s+", "");
 
-            // Set to correct channelID
-            quote.setChannelID(envVars.getChannelGeneral());
+            // CHeck for valid command and respond accordingly
+            switch (command) {
+                case "/quote":
+                    sendQuote(req, resp);
+                    break;
+                case "/githubUser":
+                    System.out.println("githubUSer");
+                    sendGithubUser(req, resp);
+                    break;
+                default:
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    break;
+            }
+        } else {
+            logger.log(Level.WARNING, "Not authorized");
+        }
+    }
 
-            // Only proceed if there are no errors
-            if (quote.getError() == null) {
-                HttpResponse<JsonNode> response = null;
-                Gson g = new GsonBuilder().create();
-                SlackResponse msgResponse;
+    // sendQuote Sends the daily quote to the channel
+    private void sendQuote(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // Get the quote of the day
+        DailyQuote quote = getQuoteOfTheDay();
+
+        // Set to correct channelID
+        quote.setChannelID(envVars.getChannelGeneral());
+
+        // Only proceed if there are no errors
+        if (quote.getError() == null) {
+            HttpResponse<JsonNode> response = null;
+            Gson g = new GsonBuilder().create();
+            SlackResponse msgResponse;
 
 
-                // Post request to send message
-                try {
+            // Post request to send message
+            try {
 
-                    // Try to send message with POST
-                    response = Unirest.post("https://slack.com/api/chat.postMessage")
-                            .header("content-type", "application/json; charset=utf-8")
-                            .header("Authorization", "Bearer " + envVars.getTOKEN())
-                            .body(quote.toJson())
-                            .asJson();
-                } catch (UnirestException e) {
-                    e.printStackTrace();
-                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                }
-
-                // Convert received response to object of POSTMessageResponse
-                msgResponse = g.fromJson(String.valueOf(response.getBody()), SlackResponse.class);
-
-                // Check for errors and log them
-                if (!msgResponse.isOk()) {
-                    logger.log(Level.WARNING, "Error: " + msgResponse.getError());
-                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                }
-
-                // Check for warnings and log them
-                if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                    logger.log(Level.WARNING, "Warning : " + msgResponse.getWarning());
-                }
-
-                resp.setStatus(HttpServletResponse.SC_OK);
-
-                // Log status code
-                logger.log(Level.FINE, "Status code: " + response.getStatus());
-            } else {
-
-                // Give error to user and logger and set status
-                logger.log(Level.WARNING, "Error " + quote.getError().toString());
-                resp.getWriter().write("<h1>Error " + HttpServletResponse.SC_SERVICE_UNAVAILABLE + "</h1><br><p>" + quote.getError().getMessage() + "</p>");
-                resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                // Try to send message with POST
+                response = Unirest.post("https://slack.com/api/chat.postMessage")
+                        .header("content-type", "application/json; charset=utf-8")
+                        .header("Authorization", "Bearer " + envVars.getTOKEN())
+                        .body(quote.toJson())
+                        .asJson();
+            } catch (UnirestException e) {
+                e.printStackTrace();
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
 
+            // Convert received response to object of POSTMessageResponse
+            msgResponse = g.fromJson(String.valueOf(response.getBody()), SlackResponse.class);
+
+            // Check for errors and log them
+            if (!msgResponse.isOk()) {
+                logger.log(Level.WARNING, "Error: " + msgResponse.getError());
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+
+            // Check for warnings and log them
+            if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
+                logger.log(Level.WARNING, "Warning : " + msgResponse.getWarning());
+                return;
+            }
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+
+            // Log status code
+            logger.log(Level.FINE, "Status code: " + response.getStatus());
         } else {
-            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+            // Give error to user and logger and set status
+            logger.log(Level.WARNING, "Error " + quote.getError().toString());
+            resp.getWriter().write("<h1>Error " + HttpServletResponse.SC_SERVICE_UNAVAILABLE + "</h1><br><p>" + quote.getError().getMessage() + "</p>");
+            resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         }
+
+    }
+
+    // sendGithubUser sends the github user to the channel
+    private void sendGithubUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String username = req.getParameter("text");
+
+        System.out.println("TEST");
+
+        if(username == null || username.isEmpty()){
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        System.out.println(username);
+
+
+        // Get the quote of the day
+        GithubUser githubUser = getGithubUser(username);
+
+        // Set to correct channelID
+        githubUser.setChannelID(envVars.getChannelGeneral());
+
+        // Only proceed if there are no errors
+        if (githubUser.getMessage() == null) {
+            HttpResponse<JsonNode> response = null;
+            Gson g = new GsonBuilder().create();
+            SlackResponse msgResponse;
+
+
+            // Post request to send message
+            try {
+
+                // Try to send message with POST
+                response = Unirest.post("https://slack.com/api/chat.postMessage")
+                        .header("content-type", "application/json; charset=utf-8")
+                        .header("Authorization", "Bearer " + envVars.getTOKEN())
+                        .body(githubUser.toJson())
+                        .asJson();
+            } catch (UnirestException e) {
+                e.printStackTrace();
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+
+            // Convert received response to object of POSTMessageResponse
+            msgResponse = g.fromJson(String.valueOf(response.getBody()), SlackResponse.class);
+
+            // Check for errors and log them
+            if (!msgResponse.isOk()) {
+                logger.log(Level.WARNING, "Error: " + msgResponse.getError());
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+
+            // Check for warnings and log them
+            if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
+                logger.log(Level.WARNING, "Warning : " + msgResponse.getWarning());
+                return;
+            }
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+
+            // Log status code
+            logger.log(Level.FINE, "Status code: " + response.getStatus());
+        } else {
+
+            // Give error to user and logger and set status
+            logger.log(Level.WARNING, "Error " + githubUser.getMessage());
+            resp.getWriter().write("<h1>Error " + HttpServletResponse.SC_SERVICE_UNAVAILABLE + "</h1><br><p>" + githubUser.getMessage() + "</p>");
+            resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        }
+
+
+    }
+
+    private GithubUser getGithubUser(String username) {
+        HttpResponse<JsonNode> response = null;
+
+        try {
+            // Get the quote in json format
+            response = Unirest.get("https://api.github.com/users/" + username)
+                    .header("accept", "application/json")
+                    .asJson();
+        } catch (UnirestException e) {
+            logger.log(Level.WARNING, "Error : " + e.getMessage());
+            return new GithubUser();
+        }
+
+        // Convert from json to class
+        return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), GithubUser.class);
     }
 
     // getQuoteOfTheDay returns the quote of the day in an object
