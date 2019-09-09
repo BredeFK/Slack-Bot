@@ -57,11 +57,6 @@ public class DailyQuote {
                     "          \"text\": {\n" +
                     "            \"type\": \"mrkdwn\",\n" +
                     "            \"text\": \"" + text + "\"\n" +
-                    "          },\n" +
-                    "          \"accessory\": {\n" +
-                    "            \"type\": \"image\",\n" +
-                    "            \"image_url\": \"" + quote.getBackground() + "\",\n" +
-                    "            \"alt_text\": \"quote-" + quote.getCategory() + "\"\n" +
                     "          }\n" +
                     "        },\n" +
                     "        {\n" +

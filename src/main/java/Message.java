@@ -23,7 +23,7 @@ public class Message extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.log(Level.INFO, "GET method was attempted");
         resp.getWriter().write("<h1>Get method does nothing, enjoy this picture of a dog</h1>" +
-                "<br><img src=\"https://i.pinimg.com/originals/7d/d2/fe/7dd2fe7c208bff009ed16fa3803a716a.jpg\" alt=\"Cute dog\">" +
+                "<br><img src=\"https://i.pinimg.com/originals/7d/d2/fe/7dd2fe7c208bff009ed16fa3803a716a.jpg\" alt=\"Cute dog\" style=\"max-width: 520px; max-height: 520px\">" +
                 "<br><a href=\"https://www.google.com/url?sa=i&source=images&cd=&ved=2ahUKEwj3o4uA5bTkAhUewsQBHYLoA6IQjRx6BAgBEAQ&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F296182112979951852%2F&psig=AOvVaw2WT22zk7BJJ8BBN10K_9tv&ust=1567604766799294\">Source here</a>");
         resp.setStatus(HttpServletResponse.SC_OK);
     }
@@ -37,7 +37,7 @@ public class Message extends HttpServlet {
 
         // Verify post request
         if (req.getParameter("command").contains("/quote") && !req.getHeader("X-Slack-Signature").isEmpty() && req.getParameter("channel_id").contains(envVars.getChannelGeneral())) {
-            
+
             // Get the quote of the day
             DailyQuote quote = getQuoteOfTheDay();
 
