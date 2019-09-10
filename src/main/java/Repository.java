@@ -1,7 +1,7 @@
 public class Repository {
     private int id;
     private String name;
-    private String html_url;
+    private String url;
     private String description;
     private String language;
 
@@ -13,8 +13,8 @@ public class Repository {
         return name;
     }
 
-    public String getHtml_url() {
-        return html_url;
+    public String getUrl() {
+        return url;
     }
 
     public String getDescription() {
@@ -27,6 +27,6 @@ public class Repository {
 
     @Override
     public String toString() {
-        return "id: " + id + "\nname: " + name + "\nhtml_url: " + html_url + "\ndesc: " + description + "\nlanguage: " + language + "\n\n";
+        return "id: " + id + "\nname: " + name + "\nurl: " + url + "\ndesc: " + description + "\nlanguage: " + language + "\n\n";
     }
 }

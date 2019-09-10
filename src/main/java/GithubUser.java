@@ -114,10 +114,10 @@ public class GithubUser {
                 output += "                {\n" +
                         "                  \"text\": {\n" +
                         "                    \"type\": \"plain_text\",\n" +
-                        "                    \"text\": \"" + repo.getName() + " (" + repo.getLanguage() + ")" +"\",\n" +
+                        "                    \"text\": \"" + repo.getName() + " (" + repo.getLanguage() + ")" + "\",\n" +
                         "                    \"emoji\": true\n" +
                         "                  },\n" +
-                        "                  \"value\": \"" + repo.getId() + "\"\n" +
+                        "                  \"value\": \"" + repo.getUrl() + "\"\n" +
                         "                },\n";
             }
 
