@@ -45,7 +45,7 @@ public class Message extends HttpServlet {
                 case "/quote":
                     sendQuote(req, resp);
                     break;
-                case "/githubUser":
+                case "/github":
                     sendGithubUser(req, resp);
                     break;
                 default:
