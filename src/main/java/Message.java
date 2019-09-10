@@ -1,6 +1,7 @@
 import DailyQuote.DailyQuote;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -122,7 +124,7 @@ public class Message extends HttpServlet {
     private void sendGithubUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String username = req.getParameter("text");
 
-        if(username == null || username.isEmpty()){
+        if (username == null || username.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -186,17 +188,39 @@ public class Message extends HttpServlet {
         HttpResponse<JsonNode> response = null;
 
         try {
-            // Get the quote in json format
+            // Get the github profile in json format
             response = Unirest.get("https://api.github.com/users/" + username)
                     .header("accept", "application/json")
                     .asJson();
         } catch (UnirestException e) {
-            logger.log(Level.WARNING, "Error : " + e.getMessage());
+            logger.log(Level.WARNING, "GithubUser Error : " + e.getMessage());
             return new GithubUser();
         }
 
+        Gson g = new GsonBuilder().create();
+
         // Convert from json to class
-        return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), GithubUser.class);
+        GithubUser user = g.fromJson(String.valueOf(response.getBody()), GithubUser.class);
+
+        // Get repositories to user if they have any public
+        if (user.getPublic_repos() > 0) {
+            try {
+                // Get the repositories in json format
+                response = Unirest.get(user.getRepos_url())
+                        .header("accept", "application/json")
+                        .asJson();
+            } catch (UnirestException e) {
+                logger.log(Level.WARNING, "GithubUser Repository Error : " + e.getMessage());
+                return new GithubUser();
+            }
+
+            // Get set the repositories to the user
+            // I got the solution from this: https://stackoverflow.com/a/12384156/8883030
+            user.setRepositories(g.fromJson(String.valueOf(response.getBody()), new TypeToken<List<Repository>>() {
+            }.getType()));
+        }
+
+        return user;
     }
 
     // getQuoteOfTheDay returns the quote of the day in an object

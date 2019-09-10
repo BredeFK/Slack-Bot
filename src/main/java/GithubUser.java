@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class GithubUser {
 
     private String channelID;
@@ -6,6 +8,7 @@ public class GithubUser {
     private String node_id;
     private String avatar_url;
     private String html_url;
+    private String repos_url;
     private String name;
     private String company;
     private String blog;
@@ -15,6 +18,7 @@ public class GithubUser {
     private int followers;
     private int following;
     private String message;
+    private ArrayList<Repository> repositories;
 
     public GithubUser() {
     }
@@ -27,12 +31,29 @@ public class GithubUser {
         return message;
     }
 
+    public String getRepos_url() {
+        return repos_url;
+    }
+
+    public int getPublic_repos() {
+        return public_repos;
+    }
+
+    public void setRepositories(ArrayList<Repository> repositories) {
+        this.repositories = repositories;
+    }
+
+    public ArrayList<Repository> getRepositories() {
+        return repositories;
+    }
+
     public String getName() {
         return name;
     }
 
     public String toJson() {
         String text = "";
+        String output = "";
 
         text += "`GitHub`\\n";
 
@@ -54,7 +75,7 @@ public class GithubUser {
             text += ":house: " + location + "\\n";
         }
 
-        return "{\n" +
+        output = "{\n" +
                 "  \"channel\": \"" + channelID + "\",\n" +
                 "  \"attachments\": [\n" +
                 "    {\n" +
@@ -70,49 +91,42 @@ public class GithubUser {
                 "              \"image_url\": \"" + avatar_url + "\",\n" +
                 "              \"alt_text\": \"avatar-" + login + "\"\n" +
                 "            }\n" +
-                "          },\n" +
-                "          {\n" +
-                "            \"type\": \"section\",\n" +
-                "            \"text\": {\n" +
-                "              \"type\": \"mrkdwn\",\n" +
-                "              \"text\": \"Repositories\"\n" +
-                "            },\n" +
-                "            \"accessory\": {\n" +
-                "              \"type\": \"static_select\",\n" +
-                "              \"placeholder\": {\n" +
-                "                \"type\": \"plain_text\",\n" +
-                "                \"text\": \"Select a repository\",\n" +
-                "                \"emoji\": true\n" +
-                "              },\n" +
-                "              \"options\": [\n" +
-                "                {\n" +
-                "                  \"text\": {\n" +
-                "                    \"type\": \"plain_text\",\n" +
-                "                    \"text\": \"Repository 1\",\n" +
-                "                    \"emoji\": true\n" +
-                "                  },\n" +
-                "                  \"value\": \"value-0\"\n" +
-                "                },\n" +
-                "                {\n" +
-                "                  \"text\": {\n" +
-                "                    \"type\": \"plain_text\",\n" +
-                "                    \"text\": \"Repository 2\",\n" +
-                "                    \"emoji\": true\n" +
-                "                  },\n" +
-                "                  \"value\": \"value-1\"\n" +
-                "                },\n" +
-                "                {\n" +
-                "                  \"text\": {\n" +
-                "                    \"type\": \"plain_text\",\n" +
-                "                    \"text\": \"Repository 3\",\n" +
-                "                    \"emoji\": true\n" +
-                "                  },\n" +
-                "                  \"value\": \"value-2\"\n" +
-                "                }\n" +
-                "              ]\n" +
-                "            }\n" +
-                "          },\n" +
-                "          {\n" +
+                "          },\n";
+
+        // Only add repositories if they have any
+        if (public_repos > 0) {
+            output += "          {\n" +
+                    "            \"type\": \"section\",\n" +
+                    "            \"text\": {\n" +
+                    "              \"type\": \"mrkdwn\",\n" +
+                    "              \"text\": \"Repositories\"\n" +
+                    "            },\n" +
+                    "            \"accessory\": {\n" +
+                    "              \"type\": \"static_select\",\n" +
+                    "              \"placeholder\": {\n" +
+                    "                \"type\": \"plain_text\",\n" +
+                    "                \"text\": \"Select a repository\",\n" +
+                    "                \"emoji\": true\n" +
+                    "              },\n" +
+                    "              \"options\": [\n";
+
+            for (Repository repo : repositories) {
+                output += "                {\n" +
+                        "                  \"text\": {\n" +
+                        "                    \"type\": \"plain_text\",\n" +
+                        "                    \"text\": \"" + repo.getName() + " (" + repo.getLanguage() + ")" +"\",\n" +
+                        "                    \"emoji\": true\n" +
+                        "                  },\n" +
+                        "                  \"value\": \"" + repo.getId() + "\"\n" +
+                        "                },\n";
+            }
+
+
+            output += "              ]\n" +
+                    "            }\n" +
+                    "          },\n";
+        }
+        output += "          {\n" +
                 "            \"type\": \"context\",\n" +
                 "            \"elements\": [\n" +
                 "              {\n" +
@@ -125,6 +139,9 @@ public class GithubUser {
                 "    }\n" +
                 "  ]\n" +
                 "}";
+
+
+        return output;
     }
 
 }
