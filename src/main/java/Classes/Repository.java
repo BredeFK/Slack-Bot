@@ -1,3 +1,5 @@
+package Classes;
+
 public class Repository {
     private int id;
     private String name;

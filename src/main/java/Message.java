@@ -1,4 +1,4 @@
-import DailyQuote.DailyQuote;
+import Classes.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -23,15 +23,6 @@ public class Message extends HttpServlet {
 
     // Get environment variables
     private EnvVars envVars = new EnvVars();
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        logger.log(Level.INFO, "GET method was attempted");
-        resp.getWriter().write("<h1>Get method does nothing, enjoy this picture of a dog</h1>" +
-                "<br><img src=\"https://i.pinimg.com/originals/7d/d2/fe/7dd2fe7c208bff009ed16fa3803a716a.jpg\" alt=\"Cute dog\" style=\"max-width: 520px; max-height: 520px\">" +
-                "<br><a href=\"https://www.google.com/url?sa=i&source=images&cd=&ved=2ahUKEwj3o4uA5bTkAhUewsQBHYLoA6IQjRx6BAgBEAQ&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F296182112979951852%2F&psig=AOvVaw2WT22zk7BJJ8BBN10K_9tv&ust=1567604766799294\">Source here</a>");
-        resp.setStatus(HttpServletResponse.SC_OK);
-    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -161,14 +152,14 @@ public class Message extends HttpServlet {
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
-                logger.log(Level.WARNING, "SlackResponse Error: " + msgResponse.getError());
+                logger.log(Level.WARNING, "Classes.SlackResponse Error: " + msgResponse.getError());
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                logger.log(Level.WARNING, "SlackResponse Warning : " + msgResponse.getWarning());
+                logger.log(Level.WARNING, "Classes.SlackResponse Warning : " + msgResponse.getWarning());
                 return;
             }
 
@@ -193,7 +184,7 @@ public class Message extends HttpServlet {
                     .header("accept", "application/json")
                     .asJson();
         } catch (UnirestException e) {
-            logger.log(Level.WARNING, "GithubUser Error : " + e.getMessage());
+            logger.log(Level.WARNING, "Classes.GithubUser Error : " + e.getMessage());
             return new GithubUser();
         }
 
@@ -210,7 +201,7 @@ public class Message extends HttpServlet {
                         .header("accept", "application/json")
                         .asJson();
             } catch (UnirestException e) {
-                logger.log(Level.WARNING, "GithubUser Repository Error : " + e.getMessage());
+                logger.log(Level.WARNING, "Classes.GithubUser Classes.Repository Error : " + e.getMessage());
                 return new GithubUser();
             }
 

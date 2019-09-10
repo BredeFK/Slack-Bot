@@ -1,3 +1,5 @@
+package Classes;
+
 public class EnvVars {
     private String TOKEN;
     private String CHANNEL_GENERAL;

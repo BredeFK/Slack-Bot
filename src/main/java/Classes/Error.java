@@ -1,4 +1,4 @@
-package DailyQuote;
+package Classes;
 
 public class Error {
 

@@ -16,7 +16,7 @@
 <div class="card bg-success">
     <div class="card-body">
         <h1>Welcome to index</h1>
-        <a href="/event" type="btn btn-primary">Event</a>
+        <a href="/event" type="btn btn-primary">Handlers.Event</a>
     </div>
 </div>
 <div class="card">

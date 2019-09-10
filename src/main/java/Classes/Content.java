@@ -1,4 +1,4 @@
-package DailyQuote;
+package Classes;
 
 import java.util.ArrayList;
 
