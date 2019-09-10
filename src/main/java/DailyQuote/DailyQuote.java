@@ -45,7 +45,7 @@ public class DailyQuote {
                 return "";
             }
 
-            String text = "_" + quote.getQuote() + "_\\n\\n- *" + quote.getAuthor() + "*";
+            String text = "`Quote`\\n_" + quote.getQuote() + "_\\n\\n- *" + quote.getAuthor() + "*";
 
             return "{\n" +
                     "  \"channel\": \"" + channelID + "\",\n" +

@@ -34,6 +34,8 @@ public class GithubUser {
     public String toJson() {
         String text = "";
 
+        text += "`GitHub`\\n";
+
         if (name != null) {
             text += "*" + name + "*\\n";
         }
@@ -41,7 +43,7 @@ public class GithubUser {
         text += login + "\\n\\n\\n";
 
         if (bio != null) {
-            text += "_" + bio + "_\\n";
+            text += "```" + bio + "```\\n";
         }
 
         if (company != null) {

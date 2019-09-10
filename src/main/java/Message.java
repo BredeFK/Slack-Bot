@@ -49,11 +49,13 @@ public class Message extends HttpServlet {
                     sendGithubUser(req, resp);
                     break;
                 default:
+                    logger.log(Level.WARNING, "The command '" + command + "' is not valid");
                     resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     break;
             }
         } else {
             logger.log(Level.WARNING, "Not authorized");
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
@@ -131,10 +133,6 @@ public class Message extends HttpServlet {
 
         // Set to correct channelID
         githubUser.setChannelID(envVars.getChannelGeneral());
-
-        logger.log(Level.INFO, githubUser.toJson());
-
-
 
         // Only proceed if there are no errors
         if (githubUser.getMessage() == null) {
