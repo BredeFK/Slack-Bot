@@ -34,40 +34,39 @@ public class GithubUser {
     public String toJson() {
         String text = "";
 
-        if(name != null){
+        if (name != null) {
             text += "*" + name + "*\\n";
         }
 
         text += login + "\\n\\n\\n";
 
-        if(bio != null){
+        if (bio != null) {
             text += "_" + bio + "_\\n";
         }
 
-        if(company != null){
+        if (company != null) {
             text += ":briefcase: " + company + "\\n";
         }
 
-        if(location != null){
+        if (location != null) {
             text += ":house: " + location + "\\n";
         }
 
         return "{\n" +
-                "  \"channel\": \""+ channelID + "\",\n" +
+                "  \"channel\": \"" + channelID + "\",\n" +
                 "  \"attachments\": [\n" +
                 "    {\n" +
                 "      \"blocks\": [\n" +
-                "        [\n" +
                 "          {\n" +
                 "            \"type\": \"section\",\n" +
                 "            \"text\": {\n" +
                 "              \"type\": \"mrkdwn\",\n" +
-                "              \"text\": \"" + text +"\"\n" +
+                "              \"text\": \"" + text + "\"\n" +
                 "            },\n" +
                 "            \"accessory\": {\n" +
                 "              \"type\": \"image\",\n" +
                 "              \"image_url\": \"" + avatar_url + "\",\n" +
-                "              \"alt_text\": \"avatar-" + login +"\"\n" +
+                "              \"alt_text\": \"avatar-" + login + "\"\n" +
                 "            }\n" +
                 "          },\n" +
                 "          {\n" +
@@ -120,7 +119,6 @@ public class GithubUser {
                 "              }\n" +
                 "            ]\n" +
                 "          }\n" +
-                "        ]\n" +
                 "      ]\n" +
                 "    }\n" +
                 "  ]\n" +

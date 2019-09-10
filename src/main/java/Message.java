@@ -35,7 +35,6 @@ public class Message extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.log(Level.INFO, "POST method was attempted");
 
-
         if (!req.getHeader("X-Slack-Signature").isEmpty() && req.getParameter("channel_id").contains(envVars.getChannelGeneral())) {
 
             // get command and remove whitespace
@@ -47,7 +46,6 @@ public class Message extends HttpServlet {
                     sendQuote(req, resp);
                     break;
                 case "/githubUser":
-                    System.out.println("githubUSer");
                     sendGithubUser(req, resp);
                     break;
                 default:
@@ -123,21 +121,20 @@ public class Message extends HttpServlet {
     private void sendGithubUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String username = req.getParameter("text");
 
-        System.out.println("TEST");
-
         if(username == null || username.isEmpty()){
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
-        System.out.println(username);
-
 
         // Get the quote of the day
         GithubUser githubUser = getGithubUser(username);
 
         // Set to correct channelID
         githubUser.setChannelID(envVars.getChannelGeneral());
+
+        logger.log(Level.INFO, githubUser.toJson());
+
+
 
         // Only proceed if there are no errors
         if (githubUser.getMessage() == null) {
@@ -148,7 +145,6 @@ public class Message extends HttpServlet {
 
             // Post request to send message
             try {
-
                 // Try to send message with POST
                 response = Unirest.post("https://slack.com/api/chat.postMessage")
                         .header("content-type", "application/json; charset=utf-8")
@@ -156,7 +152,7 @@ public class Message extends HttpServlet {
                         .body(githubUser.toJson())
                         .asJson();
             } catch (UnirestException e) {
-                e.printStackTrace();
+                logger.log(Level.WARNING, "Something went wrong with sending githubuser to channel: " + e.getMessage());
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
@@ -166,14 +162,14 @@ public class Message extends HttpServlet {
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
-                logger.log(Level.WARNING, "Error: " + msgResponse.getError());
+                logger.log(Level.WARNING, "SlackResponse Error: " + msgResponse.getError());
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                logger.log(Level.WARNING, "Warning : " + msgResponse.getWarning());
+                logger.log(Level.WARNING, "SlackResponse Warning : " + msgResponse.getWarning());
                 return;
             }
 

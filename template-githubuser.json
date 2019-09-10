@@ -3,70 +3,68 @@
   "attachments": [
     {
       "blocks": [
-        [
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "*<name>*\n<login>\n\n\n_<bio>_\n:briefcase: <company>\n:house: <loation>"
-            },
-            "accessory": {
-              "type": "image",
-              "image_url": "<avatar_url>",
-              "alt_text": "avatar-<login>"
-            }
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*<name>*\n<login>\n\n\n_<bio>_\n:briefcase: <company>\n:house: <loation>"
           },
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "Repositories"
-            },
-            "accessory": {
-              "type": "static_select",
-              "placeholder": {
-                "type": "plain_text",
-                "text": "Select a repository",
-                "emoji": true
-              },
-              "options": [
-                {
-                  "text": {
-                    "type": "plain_text",
-                    "text": "Repository 1",
-                    "emoji": true
-                  },
-                  "value": "value-0"
-                },
-                {
-                  "text": {
-                    "type": "plain_text",
-                    "text": "Repository 2",
-                    "emoji": true
-                  },
-                  "value": "value-1"
-                },
-                {
-                  "text": {
-                    "type": "plain_text",
-                    "text": "Repository 3",
-                    "emoji": true
-                  },
-                  "value": "value-2"
-                }
-              ]
-            }
+          "accessory": {
+            "type": "image",
+            "image_url": "<avatar_url>",
+            "alt_text": "avatar-<login>"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Repositories"
           },
-          {
-            "type": "context",
-            "elements": [
+          "accessory": {
+            "type": "static_select",
+            "placeholder": {
+              "type": "plain_text",
+              "text": "Select a repository",
+              "emoji": true
+            },
+            "options": [
               {
-                "type": "mrkdwn",
-                "text": "<html_url>"
+                "text": {
+                  "type": "plain_text",
+                  "text": "Repository 1",
+                  "emoji": true
+                },
+                "value": "value-0"
+              },
+              {
+                "text": {
+                  "type": "plain_text",
+                  "text": "Repository 2",
+                  "emoji": true
+                },
+                "value": "value-1"
+              },
+              {
+                "text": {
+                  "type": "plain_text",
+                  "text": "Repository 3",
+                  "emoji": true
+                },
+                "value": "value-2"
               }
             ]
           }
-        ]
+        },
+        {
+          "type": "context",
+          "elements": [
+            {
+              "type": "mrkdwn",
+              "text": "<html_url>"
+            }
+          ]
+        }
       ]
     }
   ]
