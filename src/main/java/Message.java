@@ -108,12 +108,11 @@ public class Message extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
 
             // Log status code
-            logger.log(Level.FINE, "Status code: " + response.getStatus());
+            logger.log(Level.INFO, "Quote Status code: " + response.getStatus());
         } else {
 
-            // Give error to user and logger and set status
+            // Log error and return status code 503
             logger.log(Level.WARNING, "Error " + quote.getError().toString());
-            resp.getWriter().write("<h1>Error " + HttpServletResponse.SC_SERVICE_UNAVAILABLE + "</h1><br><p>" + quote.getError().getMessage() + "</p>");
             resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         }
 
@@ -174,16 +173,13 @@ public class Message extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
 
             // Log status code
-            logger.log(Level.FINE, "Status code: " + response.getStatus());
+            logger.log(Level.INFO, "Github Status code: " + response.getStatus());
         } else {
 
-            // Give error to user and logger and set status
+            // Log error and return status code 404
             logger.log(Level.WARNING, "Error " + githubUser.getMessage());
-            resp.getWriter().write("<h1>Error " + HttpServletResponse.SC_SERVICE_UNAVAILABLE + "</h1><br><p>" + githubUser.getMessage() + "</p>");
-            resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
-
-
     }
 
     private GithubUser getGithubUser(String username) {
