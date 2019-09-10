@@ -2,6 +2,10 @@
 ## About
 This will be a bot in slack driven on java code.
 
+## Functionality
+* `/quote` returns a daily quote
+* `/github <Username>` returns the user if they exist
+
 ## Technologies
 * TomCat
 * Java
