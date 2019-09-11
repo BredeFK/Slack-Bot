@@ -24,6 +24,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "id: " + id + "\nusername: " + username + "\nname: " + name + "\nteam_id: " + team_id;
+        return String.format("%nid: %s%nusername: %s%nname: %s%neam_id: %s%n",
+                id, username, name, team_id);
     }
 }

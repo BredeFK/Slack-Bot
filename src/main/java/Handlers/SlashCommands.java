@@ -65,6 +65,8 @@ public class SlashCommands extends HttpServlet {
         // Set to correct channelID
         quote.setChannelID(envVars.getChannelGeneral());
 
+        logger.log(Level.INFO, quote.toString());
+
         // Only proceed if there are no errors
         if (quote.getError() == null) {
             HttpResponse<JsonNode> response = null;
@@ -130,6 +132,8 @@ public class SlashCommands extends HttpServlet {
 
         // Set to correct channelID
         githubUser.setChannelID(envVars.getChannelGeneral());
+
+        logger.log(Level.INFO, githubUser.toString());
 
         // Only proceed if there are no errors
         if (githubUser.getMessage() == null) {

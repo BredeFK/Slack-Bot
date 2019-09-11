@@ -18,6 +18,6 @@ public class Error {
 
     @Override
     public String toString() {
-        return code + " - " + message;
+        return String.format("%d - %s", code, message);
     }
 }

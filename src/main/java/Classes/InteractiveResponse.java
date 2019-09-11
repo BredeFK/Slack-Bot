@@ -36,7 +36,7 @@ public class InteractiveResponse {
 
     @Override
     public String toString() {
-        return "\ntype: " + type + "\nuser: {\n" + user.toString() + "\n}\napi_app_id: "
-                + api_app_id + "\ntoken: " + token + "\nresponse_url: " + response_url + "\naction: {\n" + actions.get(0).toString() + "\n}";
+        return String.format("%ntype: %s%nuser: {%n %s %n}%napi_app_id: %s%ntoken: %s%nresponse_url: %s%naction: {%n %s %n}",
+                type, user.toString(), api_app_id, token, response_url, actions.get(0).toString());
     }
 }

@@ -9,6 +9,6 @@ public class Action {
 
     @Override
     public String toString() {
-        return "\nselected:option: {\n" + selected_option.toString() + "\n}";
+        return String.format("%nselected_option: {%n %s %n}", selected_option.toString());
     }
 }

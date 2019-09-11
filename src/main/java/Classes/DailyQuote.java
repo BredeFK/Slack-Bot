@@ -28,6 +28,12 @@ public class DailyQuote {
         return contents;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%nerror: %s%ncontents: { %s %n}%nchannelIdD: %s",
+                error, contents.toString(), channelID);
+    }
+
     // Converts object to formatted json that can be sent to Slacks "Block Kit Builder" https://api.slack.com/tools/block-kit-builder
     public String toJson() {
 
@@ -47,8 +53,8 @@ public class DailyQuote {
 
             String text = "`Quote`\\n_" + quote.getQuote() + "_\\n\\n- *" + quote.getAuthor() + "*";
 
-            return "{\n" +
-                    "  \"channel\": \"" + channelID + "\",\n" +
+            String output = "{\n" +
+                    "  \"channel\": \"%s\",\n" +
                     "  \"attachments\": [\n" +
                     "    {\n" +
                     "      \"blocks\": [\n" +
@@ -56,7 +62,7 @@ public class DailyQuote {
                     "          \"type\": \"section\",\n" +
                     "          \"text\": {\n" +
                     "            \"type\": \"mrkdwn\",\n" +
-                    "            \"text\": \"" + text + "\"\n" +
+                    "            \"text\": \"%s\"\n" +
                     "          }\n" +
                     "        },\n" +
                     "        {\n" +
@@ -64,7 +70,7 @@ public class DailyQuote {
                     "          \"elements\": [\n" +
                     "            {\n" +
                     "              \"type\": \"mrkdwn\",\n" +
-                    "              \"text\": \"*Last updated:* " + formatDate + "\\n:copyright: " + contents.getCopyright() + "\\n\"\n" +
+                    "              \"text\": \"*Last updated:* %s\\n:copyright: %s\\n\"\n" +
                     "            }\n" +
                     "          ]\n" +
                     "        }\n" +
@@ -72,6 +78,8 @@ public class DailyQuote {
                     "    }\n" +
                     "  ]\n" +
                     "}";
+
+            return String.format(output, channelID, text, formatDate, contents.getCopyright());
         } else {
             logger.log(Level.WARNING, "Error : contents is empty!");
             return "";

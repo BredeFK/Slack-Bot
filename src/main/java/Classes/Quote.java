@@ -61,4 +61,10 @@ public class Quote {
     public String getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%nquote: %s%nlength: %s%nauthor %s%ncategory: %s%ndate: %s%npermalink: %s%ntitle: %s%nbackground: %s%nid: %s",
+                quote, length, author, category, date, permalink, title, background, id);
+    }
 }

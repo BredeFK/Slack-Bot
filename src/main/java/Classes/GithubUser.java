@@ -53,6 +53,12 @@ public class GithubUser {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%nchannelID: %s%nlogin: %s%nid: %d%nnode_id: %s%navatar_url: %s%nhtml_url: %s%nrepos_url: %s%nname: %s%ncompany: %s%nblog: %s%nlocation: %s%nbio: %s%npublic_repos: %d%nfollowers: %d%nfollowing: %d%nmessage: %s",
+                channelID, login, id, node_id, avatar_url, html_url, repos_url, name, company, blog, location, bio, public_repos, followers, following, message);
+    }
+
     public String toJson() {
         String text = "";
         String output = "";
@@ -113,11 +119,11 @@ public class GithubUser {
                     "              \"options\": [\n";
 
             for (Repository repo : repositories) {
-                String language = (repo.getLanguage() != null) ?  " (" + repo.getLanguage() + ")" : " (N/A)";
+                String language = (repo.getLanguage() != null) ? " (" + repo.getLanguage() + ")" : " (N/A)";
                 output += "                {\n" +
                         "                  \"text\": {\n" +
                         "                    \"type\": \"plain_text\",\n" +
-                        "                    \"text\": \"" + repo.getName()  + language + "\",\n" +
+                        "                    \"text\": \"" + repo.getName() + language + "\",\n" +
                         "                    \"emoji\": true\n" +
                         "                  },\n" +
                         "                  \"value\": \"" + repo.getUrl() + "\"\n" +

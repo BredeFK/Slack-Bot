@@ -29,6 +29,7 @@ public class Repository {
 
     @Override
     public String toString() {
-        return "id: " + id + "\nname: " + name + "\nurl: " + url + "\ndesc: " + description + "\nlanguage: " + language + "\n\n";
+        return String.format("%nid: %d%nname: %s%nurl: %s%ndescription: %s%nlanguage: %s%n%n",
+                id, name, url, description, language);
     }
 }

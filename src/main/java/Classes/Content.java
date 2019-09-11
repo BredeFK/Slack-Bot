@@ -16,4 +16,9 @@ public class Content {
     public ArrayList<Quote> getQuotes() {
         return quotes;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%ncopyright: %s%nquotes: %s", copyright, quotes.get(0).toString());
+    }
 }

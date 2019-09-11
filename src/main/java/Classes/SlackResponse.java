@@ -25,4 +25,10 @@ public class SlackResponse {
     public String getWarning() {
         return warning;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%nok: %s%nerror: %s%nwarning: %s%nactions: %s",
+                ok, error, warning, actions.get(0).toString());
+    }
 }

@@ -9,6 +9,6 @@ public class SelectedOption {
 
     @Override
     public String toString() {
-        return "\nvalue: " + value;
+        return String.format("%nvalue: %s", value);
     }
 }
