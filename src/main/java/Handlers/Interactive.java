@@ -1,7 +1,14 @@
 package Handlers;
 
+import Classes.EnvVars;
 import Classes.InteractiveResponse;
+import Classes.SlackResponse;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.JSONException;
 
 import javax.servlet.ServletException;
@@ -12,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,12 +53,12 @@ public class Interactive extends HttpServlet {
             // Convert json string to object of InteractiveResponse
             InteractiveResponse response = new GsonBuilder().create().fromJson(payload, InteractiveResponse.class);
 
-            if(response.getType() == null || response.getType().isEmpty()){
+            if (response.getType() == null || response.getType().isEmpty()) {
                 logger.log(Level.WARNING, "Error: Something went wrong from parsing 'x-www-form-urlencoded' to InterActiveResponse object");
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            } else{
+            } else {
                 logger.log(Level.INFO, "'x-www-form-urlencoded' was parsed successfully");
-                resp.setStatus(HttpServletResponse.SC_OK);
+                respondToUserChoice(req, resp, response);
             }
 
         } catch (JSONException e) {
@@ -60,5 +66,68 @@ public class Interactive extends HttpServlet {
             logger.log(Level.WARNING, "Error parsing json: " + e.getMessage());
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private void respondToUserChoice(HttpServletRequest req, HttpServletResponse resp, InteractiveResponse interactiveResponse) {
+
+        HttpResponse<JsonNode> response = null;
+        Gson g = new GsonBuilder().create();
+        SlackResponse msgResponse;
+
+        // Get environment variables
+        EnvVars envVars = new EnvVars();
+
+        String message = "{\n" +
+                "  \"channel\": \"" + envVars.getChannelGeneral() + "\",\n" +
+                "  \"attachments\": [\n" +
+                "    {\n" +
+                "      \"blocks\": [\n" +
+                "        {\n" +
+                "          \"type\": \"section\",\n" +
+                "          \"text\": {\n" +
+                "            \"type\": \"mrkdwn\",\n" +
+                "            \"text\": \"" + interactiveResponse.getActions().get(0).getSelected_option() + "\"\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        // Post request to send message
+        try {
+
+            // Try to send message with POST
+            response = Unirest.post(interactiveResponse.getResponse_url())
+                    .header("content-type", "application/json; charset=utf-8")
+                    .header("Authorization", "Bearer " + envVars.getTOKEN())
+                    .body(message)
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        // Convert received response to object of POSTMessageResponse
+        msgResponse = g.fromJson(String.valueOf(response.getBody()), SlackResponse.class);
+
+        // Check for errors and log them
+        if (!msgResponse.isOk()) {
+            logger.log(Level.WARNING, "Interactive Error: " + msgResponse.getError());
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        // Check for warnings and log them
+        if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
+            logger.log(Level.WARNING, "Interactive Warning : " + msgResponse.getWarning());
+            return;
+        }
+
+        resp.setStatus(HttpServletResponse.SC_OK);
+
+        // Log status code
+        logger.log(Level.INFO, "Interactive code: " + response.getStatus());
     }
 }
