@@ -29,7 +29,9 @@ public class Interactive extends HttpServlet {
             BufferedReader reader = req.getReader();
             while ((line = reader.readLine()) != null)
                 jb.append(line);
-        } catch (Exception e) { /*report an error*/ }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error: " + e.getMessage());
+        }
 
         try {
 
@@ -38,8 +40,7 @@ public class Interactive extends HttpServlet {
 
         } catch (JSONException e) {
             // crash and burn
-            logger.log(Level.WARNING, e.getMessage());
-            throw new IOException("Error parsing JSON request string");
+            logger.log(Level.WARNING, "Error parsing json: " + e.getMessage());
         }
     }
 }
