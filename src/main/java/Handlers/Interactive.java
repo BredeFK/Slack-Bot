@@ -35,9 +35,14 @@ public class Interactive extends HttpServlet {
         }
 
         try {
-            System.out.println("Checkpoint 2");
 
-            System.out.println("Checkpoint 2.5: " + jb.toString());
+            // TODO : remove when error is found
+            System.out.println("Headers: " + req.getHeaderNames());
+            System.out.println("Content type: " + req.getContentType());
+            System.out.println("Request to string: " + req.toString());
+            System.out.println("Attributes: " + req.getAttributeNames());
+            System.out.println("Parameters: " + req.getParameterNames());
+            System.out.println("Body: " + jb.toString());
 
             InteractiveResponse response = new GsonBuilder().create().fromJson(jb.toString(), InteractiveResponse.class);
             logger.log(Level.INFO, response.toString());
