@@ -44,7 +44,7 @@ public class Interactive extends HttpServlet {
             System.out.println("Parameters: " + req.getParameterNames());
             System.out.println("Body: " + jb.toString());
 
-            InteractiveResponse response = new GsonBuilder().create().fromJson(jb.toString(), InteractiveResponse.class);
+            String response = new GsonBuilder().create().toJson(jb.toString(), InteractiveResponse.class);
             logger.log(Level.INFO, response.toString());
 
         } catch (JSONException e) {
