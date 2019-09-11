@@ -113,10 +113,11 @@ public class GithubUser {
                     "              \"options\": [\n";
 
             for (Repository repo : repositories) {
+                String language = (repo.getLanguage() == null) ?  " (" + repo.getLanguage() + ")" : " (N/A)";
                 output += "                {\n" +
                         "                  \"text\": {\n" +
                         "                    \"type\": \"plain_text\",\n" +
-                        "                    \"text\": \"" + repo.getName() + " (" + repo.getLanguage() + ")" + "\",\n" +
+                        "                    \"text\": \"" + repo.getName()  + language + "\",\n" +
                         "                    \"emoji\": true\n" +
                         "                  },\n" +
                         "                  \"value\": \"" + repo.getUrl() + "\"\n" +
