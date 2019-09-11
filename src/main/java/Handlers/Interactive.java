@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,34 +29,36 @@ public class Interactive extends HttpServlet {
         StringBuilder jb = new StringBuilder();
         String line = null;
         try {
-            System.out.println("Checkpoint 1");
             BufferedReader reader = req.getReader();
             while ((line = reader.readLine()) != null)
                 jb.append(line);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error: " + e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
 
         try {
 
-            // TODO : remove when error is found
-            System.out.println("Headers: " + req.getHeaderNames());
-            System.out.println("Content type: " + req.getContentType());
-            System.out.println("Request to string: " + req.toString());
-            System.out.println("Attributes: " + req.getAttributeNames());
-            System.out.println("Parameters: " + req.getParameterNames());
-            System.out.println("Body: " + jb.toString());
-            System.out.println("Parameter: " + req.getParameter("type"));
-            System.out.println("Header: " + req.getHeader("type"));
+            // Reason I found out how to parse the request: http://www.herongyang.com/Encoding/URLEncoding-application-x-www-form-urlencoded-Java.html
+            // Decode x-www-form-urlencoded and remove 'payload=' at the beginning (Convert to json string)
+            String payload = URLDecoder.decode(jb.toString(), StandardCharsets.UTF_8).replace("payload=", "");
 
-            String response = new GsonBuilder().create().toJson(jb.toString(), InteractiveResponse.class);
-            logger.log(Level.INFO, response.toString());
+            // Convert json string to object of InteractiveResponse
+            InteractiveResponse response = new GsonBuilder().create().fromJson(payload, InteractiveResponse.class);
+
+            if(response.getType() == null || response.getType().isEmpty()){
+                logger.log(Level.WARNING, "Error: Something went wrong from parsing 'x-www-form-urlencoded' to InterActiveResponse object");
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            } else{
+                logger.log(Level.INFO, "'x-www-form-urlencoded' was parsed successfully");
+                resp.setStatus(HttpServletResponse.SC_OK);
+            }
 
         } catch (JSONException e) {
             // crash and burn
             logger.log(Level.WARNING, "Error parsing json: " + e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-
-        System.out.println("Checkpoint 3");
     }
 }
