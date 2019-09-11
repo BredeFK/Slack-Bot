@@ -26,6 +26,7 @@ public class Interactive extends HttpServlet {
         StringBuilder jb = new StringBuilder();
         String line = null;
         try {
+            System.out.println("Checkpoint 1");
             BufferedReader reader = req.getReader();
             while ((line = reader.readLine()) != null)
                 jb.append(line);
@@ -34,6 +35,7 @@ public class Interactive extends HttpServlet {
         }
 
         try {
+            System.out.println("Checkpoint 2");
 
             InteractiveResponse response = new GsonBuilder().create().fromJson(jb.toString(), InteractiveResponse.class);
             logger.log(Level.INFO, response.toString());
@@ -42,5 +44,7 @@ public class Interactive extends HttpServlet {
             // crash and burn
             logger.log(Level.WARNING, "Error parsing json: " + e.getMessage());
         }
+
+        System.out.println("Checkpoint 3");
     }
 }
