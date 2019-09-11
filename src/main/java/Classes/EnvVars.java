@@ -1,8 +1,8 @@
 package Classes;
 
 public class EnvVars {
-    private String TOKEN;
-    private String CHANNEL_GENERAL;
+    private final String TOKEN;
+    private final String CHANNEL_GENERAL;
 
     public EnvVars() {
         TOKEN = System.getenv("SLACK-BOT-TOKEN");

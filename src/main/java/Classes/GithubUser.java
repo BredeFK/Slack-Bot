@@ -60,27 +60,27 @@ public class GithubUser {
     }
 
     public String toJson() {
-        String text = "";
+        StringBuilder text = new StringBuilder();
         String output = "";
 
-        text += "`GitHub`\\n";
+        text.append("`GitHub`\\n");
 
         if (name != null) {
-            text += "*" + name + "*\\n";
+            text.append(String.format("*%s*\\n", name));
         }
 
-        text += login + "\\n\\n\\n";
+        text.append(String.format("%s\\n\\n\\n", login));
 
         if (bio != null) {
-            text += "```" + bio + "```\\n";
+            text.append(String.format("```%s```\\n", bio));
         }
 
         if (company != null) {
-            text += ":briefcase: " + company + "\\n";
+            text.append(String.format(":briefcase: %s\\n", company));
         }
 
         if (location != null) {
-            text += ":house: " + location + "\\n";
+            text.append(String.format(":house: %s\\n", location));
         }
 
         output = "{\n" +
@@ -92,7 +92,7 @@ public class GithubUser {
                 "            \"type\": \"section\",\n" +
                 "            \"text\": {\n" +
                 "              \"type\": \"mrkdwn\",\n" +
-                "              \"text\": \"" + text + "\"\n" +
+                "              \"text\": \"" + text.toString() + "\"\n" +
                 "            },\n" +
                 "            \"accessory\": {\n" +
                 "              \"type\": \"image\",\n" +
