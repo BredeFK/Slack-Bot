@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,32 +40,28 @@ public class Interactive extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
 
 
-        // TODO : find a way to decode url
-        /*
+        // Source: https://stackoverflow.com/a/16453677/8883030
+        // Decode x-www-form-urlencoded and remove 'payload=' at the beginning (Convert to json string)
+        String payload = null;
         try {
-
-            // Reason I found out how to parse the request: http://www.herongyang.com/Encoding/URLEncoding-application-x-www-form-urlencoded-Java.html
-            // Decode x-www-form-urlencoded and remove 'payload=' at the beginning (Convert to json string)
-            String payload;
-            payload = URLDecoder.decode(body, StandardCharsets.UTF_8).replace("payload=", "");
-
-            // Convert json string to object of InteractiveResponse
-            InteractiveResponse response = new GsonBuilder().create().fromJson(payload, InteractiveResponse.class);
-
-            if (response.getType() == null || response.getType().isEmpty()) {
-                logger.log(Level.WARNING, "Error: Something went wrong from parsing 'x-www-form-urlencoded' to InterActiveResponse object");
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            } else {
-                logger.log(Level.INFO, "'x-www-form-urlencoded' was parsed successfully");
-                respondToUserChoice(req, resp, response);
-            }
-
-        } catch (JSONException e) {
-            // crash and burn
-            logger.log(Level.WARNING, "Error parsing json: " + e.getMessage());
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            // payload = URLDecoder.decode(body, StandardCharsets.UTF_8).replace("payload=", "");
+            payload = new URI(body).getPath().replace("payload=", "");
+        } catch (URISyntaxException e) {
+            logger.log(Level.WARNING, "Error parsing x-www-form-urlencoded from body: " + e.getMessage());
+            return;
         }
-         */
+
+
+        // Convert json string to object of InteractiveResponse
+        InteractiveResponse response = new GsonBuilder().create().fromJson(payload, InteractiveResponse.class);
+
+        if (response.getType() == null || response.getType().isEmpty()) {
+            logger.log(Level.WARNING, "Error: Something went wrong from parsing 'x-www-form-urlencoded' to InterActiveResponse object");
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } else {
+            logger.log(Level.INFO, "'x-www-form-urlencoded' was parsed successfully");
+            respondToUserChoice(req, resp, response);
+        }
     }
 
     private void respondToUserChoice(HttpServletRequest req, HttpServletResponse resp, InteractiveResponse interactiveResponse) {
@@ -75,22 +73,9 @@ public class Interactive extends HttpServlet {
         // Get environment variables
         EnvVars envVars = new EnvVars();
 
-        String message = "{\n" +
-                "  \"channel\": \"" + envVars.getChannelGeneral() + "\",\n" +
-                "  \"attachments\": [\n" +
-                "    {\n" +
-                "      \"blocks\": [\n" +
-                "        {\n" +
-                "          \"type\": \"section\",\n" +
-                "          \"text\": {\n" +
-                "            \"type\": \"mrkdwn\",\n" +
-                "            \"text\": \"" + interactiveResponse.getActions().get(0).getSelected_option() + "\"\n" +
-                "          }\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+        // Construct message response
+        String message = String.format("{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n" +
+                "\"text\": {\n\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n}\n}\n\n}\n]\n}", envVars.getChannelGeneral(), interactiveResponse.getActions().get(0).getSelected_option());
 
         // Post request to send message
         try {
