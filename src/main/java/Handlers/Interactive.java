@@ -35,8 +35,6 @@ public class Interactive extends HttpServlet {
         // Get body from request
         String body = new GeneralFunctions().getBody(req);
 
-        logger.log(Level.INFO, body);
-
         resp.setStatus(HttpServletResponse.SC_OK);
 
 
@@ -60,6 +58,7 @@ public class Interactive extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } else {
             logger.log(Level.INFO, "'x-www-form-urlencoded' was parsed successfully");
+            logger.log(Level.INFO, response.toString());
             respondToUserChoice(req, resp, response);
         }
     }
@@ -76,6 +75,8 @@ public class Interactive extends HttpServlet {
         // Construct message response
         String message = String.format("{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n" +
                 "\"text\": {\n\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n}\n}\n\n}\n]\n}", envVars.getChannelGeneral(), interactiveResponse.getActions().get(0).getSelected_option());
+
+        logger.log(Level.INFO, message);
 
         // Post request to send message
         try {
