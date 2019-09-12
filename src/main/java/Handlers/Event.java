@@ -1,5 +1,6 @@
 package Handlers;
 
+import Classes.GeneralFunctions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,7 +9,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,16 +23,12 @@ public class Event extends HttpServlet {
         logger.log(Level.INFO, "POST request on /event");
 
         if (!req.getHeader("X-Slack-Signature").isEmpty()) {
-            StringBuilder jb = new StringBuilder();
-            String line = null;
-            try {
-                BufferedReader reader = req.getReader();
-                while ((line = reader.readLine()) != null)
-                    jb.append(line);
-            } catch (Exception e) { /*report an error*/ }
+
+            // Get body from request
+            String body = new GeneralFunctions().getBody(req);
 
             try {
-                JSONObject jsonObject = new JSONObject(jb.toString());
+                JSONObject jsonObject = new JSONObject(body);
 
                 if (!jsonObject.isNull("challenge")) {
                     resp.setContentType("text/plain;charset=utf-8");
