@@ -61,7 +61,8 @@ public class GithubUser {
 
     public String toJson() {
         StringBuilder text = new StringBuilder();
-        String output = "";
+        StringBuilder output = new StringBuilder();
+        String temp = "";
 
         text.append("`GitHub`\\n");
 
@@ -83,74 +84,43 @@ public class GithubUser {
             text.append(String.format(":house: %s\\n", location));
         }
 
-        output = "{\n" +
-                "  \"channel\": \"" + channelID + "\",\n" +
-                "  \"attachments\": [\n" +
-                "    {\n" +
-                "      \"blocks\": [\n" +
-                "          {\n" +
-                "            \"type\": \"section\",\n" +
-                "            \"text\": {\n" +
-                "              \"type\": \"mrkdwn\",\n" +
-                "              \"text\": \"" + text.toString() + "\"\n" +
-                "            },\n" +
-                "            \"accessory\": {\n" +
-                "              \"type\": \"image\",\n" +
-                "              \"image_url\": \"" + avatar_url + "\",\n" +
-                "              \"alt_text\": \"avatar-" + login + "\"\n" +
-                "            }\n" +
-                "          },\n";
+        // See template-githubuser.json for better understanding of this json
+        temp = "{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n\"text\": {\n" +
+                "\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n},\n\"accessory\": {\n\"type\": \"image\",\n\"image_url\": \"%s\",\n" +
+                "\"alt_text\": \"avatar-%s\"\n}\n},\n";
+
+        output.append(String.format(temp, channelID, text.toString(), avatar_url, login));
 
         // Only add repositories if they have any
         if (public_repos > 0) {
-            output += "          {\n" +
-                    "            \"type\": \"section\",\n" +
-                    "            \"text\": {\n" +
-                    "              \"type\": \"mrkdwn\",\n" +
-                    "              \"text\": \"Repositories\"\n" +
-                    "            },\n" +
-                    "            \"accessory\": {\n" +
-                    "              \"type\": \"static_select\",\n" +
-                    "              \"placeholder\": {\n" +
-                    "                \"type\": \"plain_text\",\n" +
-                    "                \"text\": \"Select a repository\",\n" +
-                    "                \"emoji\": true\n" +
-                    "              },\n" +
-                    "              \"options\": [\n";
+            output.append("{\n\"type\": \"section\",\n\"text\": {\n\"type\": \"mrkdwn\",\n\"text\": \"Repositories\"\n" +
+                    "},\n\"accessory\": {\n\"type\": \"static_select\",\n\"placeholder\": {\n\"type\": \"plain_text\",\n" +
+                    "\"text\": \"Select a repository\",\n\"emoji\": true\n},\n\"options\": [\n");
 
+            // temp is the standard format for all repos
+            temp = "{\n\"text\": {\n\"type\": \"plain_text\",\n\"text\": \"%s %s\",\n\"emoji\": true\n},\n" +
+                    "\"value\": \"%s\"\n},\n";
+
+            // Create json object for each repo
             for (Repository repo : repositories) {
-                String language = (repo.getLanguage() != null) ? " (" + repo.getLanguage() + ")" : " (N/A)";
-                output += "                {\n" +
-                        "                  \"text\": {\n" +
-                        "                    \"type\": \"plain_text\",\n" +
-                        "                    \"text\": \"" + repo.getName() + language + "\",\n" +
-                        "                    \"emoji\": true\n" +
-                        "                  },\n" +
-                        "                  \"value\": \"" + repo.getUrl() + "\"\n" +
-                        "                },\n";
+
+                // Get and format language
+                String language = (repo.getLanguage() != null) ? "(" + repo.getLanguage() + ")" : "(N/A)";
+
+                // Append repo json info
+                output.append(String.format(temp, repo.getName(), language, repo.getUrl()));
             }
 
-
-            output += "              ]\n" +
-                    "            }\n" +
-                    "          },\n";
+            // Append closing brackets
+            output.append("]\n}\n},\n");
         }
-        output += "          {\n" +
-                "            \"type\": \"context\",\n" +
-                "            \"elements\": [\n" +
-                "              {\n" +
-                "                \"type\": \"mrkdwn\",\n" +
-                "                \"text\": \"" + html_url + "\"\n" +
-                "              }\n" +
-                "            ]\n" +
-                "          }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+
+        // Append users github page url at bottom
+        temp = "{\n\"type\": \"context\",\n\"elements\": [\n{\n\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n}\n]\n}\n]\n}\n]\n}";
+        output.append(String.format(temp, html_url));
 
 
-        return output;
+        return output.toString();
     }
 
 }
