@@ -74,7 +74,7 @@ public class Interactive extends HttpServlet {
 
         // Construct message response
         String message = String.format("{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n" +
-                "\"text\": {\n\"type\": \"plain_text\",\n\"text\": \"%s\",\n\"emoji\": true\n}\n}\n\n}\n]\n}", envVars.getChannelGeneral(), "TEST"); // TODO switch to use : interactiveResponse.getActions().get(0).getSelected_option()
+                "\"text\": {\n\"type\": \"plain_text\",\n\"text\": \"%s\",\n\"emoji\": true\n}\n}\n]\n}\n]\n}", envVars.getChannelGeneral(), interactiveResponse.getActions().get(0).getSelected_option()); // TODO : maybe remove value: 
 
         logger.log(Level.INFO, message);
 
