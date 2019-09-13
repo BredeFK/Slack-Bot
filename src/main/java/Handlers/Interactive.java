@@ -1,10 +1,11 @@
 package Handlers;
 
-import Classes.EnvVars;
-import Classes.GeneralFunctions;
-import Classes.InteractiveResponse;
-import Classes.SlackResponse;
+import Classes.*;
 import com.google.gson.GsonBuilder;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -59,15 +60,30 @@ public class Interactive extends HttpServlet {
 
     private void respondToUserChoice(HttpServletRequest req, HttpServletResponse resp, InteractiveResponse interactiveResponse) {
 
+        // Check if actions List is empty
+        if (interactiveResponse.getActions().isEmpty()) {
+            logger.log(Level.WARNING, "Actions Error: actions list is empty!");
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
         // Get environment variables
         EnvVars envVars = new EnvVars();
 
-        // Construct message response
-        String message = String.format("{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n" +
-                "\"text\": {\n\"type\": \"plain_text\",\n\"text\": \"%s\",\n\"emoji\": true\n}\n}\n]\n}\n]\n}", envVars.getChannelGeneral(), interactiveResponse.getActions().get(0).getSelected_option().getValue());
+        // Get repository from api url
+        Repository repo = getRepository(interactiveResponse.getActions().get(0).getSelected_option().getValue());
+
+        // Check if repository object is empty
+        if (repo.getName() == null || repo.getName().isEmpty()) {
+            logger.log(Level.WARNING, "Repository Error: Repository object is empty");
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        repo.setChannelID(envVars.getChannelGeneral());
 
         // Try to post message to slack user
-        SlackResponse slackResponse = new GeneralFunctions().postSlackMessage(interactiveResponse.getResponse_url(), envVars.getTOKEN(), message);
+        SlackResponse slackResponse = new GeneralFunctions().postSlackMessage(interactiveResponse.getResponse_url(), envVars.getTOKEN(), repo.toJson());
 
         // Check for errors and log them
         if (!slackResponse.isOk()) {
@@ -84,5 +100,22 @@ public class Interactive extends HttpServlet {
         }
 
         resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    private Repository getRepository(String URL) {
+        HttpResponse<JsonNode> response = null;
+        try {
+
+            // Get the repository in json format
+            response = Unirest.get(URL)
+                    .header("accept", "application/json")
+                    .asJson();
+        } catch (UnirestException e) {
+            logger.log(Level.WARNING, "getRepository() Error : " + e.getMessage());
+            return new Repository();
+        }
+
+        // Convert from json to class
+        return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), Repository.class);
     }
 }
