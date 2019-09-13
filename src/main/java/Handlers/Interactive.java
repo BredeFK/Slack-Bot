@@ -4,12 +4,7 @@ import Classes.EnvVars;
 import Classes.GeneralFunctions;
 import Classes.InteractiveResponse;
 import Classes.SlackResponse;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -58,60 +53,36 @@ public class Interactive extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } else {
             logger.log(Level.INFO, "'x-www-form-urlencoded' was parsed successfully");
-            logger.log(Level.INFO, response.toString());
             respondToUserChoice(req, resp, response);
         }
     }
 
     private void respondToUserChoice(HttpServletRequest req, HttpServletResponse resp, InteractiveResponse interactiveResponse) {
 
-        HttpResponse<JsonNode> response = null;
-        Gson g = new GsonBuilder().create();
-        SlackResponse msgResponse;
-
         // Get environment variables
         EnvVars envVars = new EnvVars();
 
         // Construct message response
         String message = String.format("{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n" +
-                "\"text\": {\n\"type\": \"plain_text\",\n\"text\": \"%s\",\n\"emoji\": true\n}\n}\n]\n}\n]\n}", envVars.getChannelGeneral(), interactiveResponse.getActions().get(0).getSelected_option()); // TODO : maybe remove value: 
+                "\"text\": {\n\"type\": \"plain_text\",\n\"text\": \"%s\",\n\"emoji\": true\n}\n}\n]\n}\n]\n}", envVars.getChannelGeneral(), interactiveResponse.getActions().get(0).getSelected_option().getValue());
 
-        logger.log(Level.INFO, message);
-
-        // Post request to send message
-        try {
-
-            // Try to send message with POST
-            response = Unirest.post(interactiveResponse.getResponse_url())
-                    .header("content-type", "application/json; charset=utf-8")
-                    .header("Authorization", "Bearer " + envVars.getTOKEN())
-                    .body(message)
-                    .asJson();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
-
-        // Convert received response to object of POSTMessageResponse
-        msgResponse = g.fromJson(String.valueOf(response.getBody()), SlackResponse.class);
+        // Try to post message to slack user
+        SlackResponse slackResponse = new GeneralFunctions().postSlackMessage(interactiveResponse.getResponse_url(), envVars.getTOKEN(), message);
 
         // Check for errors and log them
-        if (!msgResponse.isOk()) {
-            logger.log(Level.WARNING, "Interactive Error: " + msgResponse.getError());
+        if (!slackResponse.isOk()) {
+            logger.log(Level.WARNING, "Interactive Error: " + slackResponse.getError());
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
 
         // Check for warnings and log them
-        if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-            logger.log(Level.WARNING, "Interactive Warning : " + msgResponse.getWarning());
+        if (slackResponse.getWarning() != null && !slackResponse.getWarning().isEmpty()) {
+            logger.log(Level.WARNING, "Interactive Warning : " + slackResponse.getWarning());
+            resp.setStatus(HttpServletResponse.SC_ACCEPTED);
             return;
         }
 
         resp.setStatus(HttpServletResponse.SC_OK);
-
-        // Log status code
-        logger.log(Level.INFO, "Interactive code: " + response.getStatus());
     }
 }

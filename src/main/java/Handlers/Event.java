@@ -38,7 +38,7 @@ public class Event extends HttpServlet {
                 }
             } catch (JSONException e) {
                 // crash and burn
-                logger.log(Level.WARNING, e.getMessage());
+                logger.log(Level.WARNING, "Event Error: " + e.getMessage());
                 throw new IOException("Error parsing JSON request string");
             }
         }

@@ -67,28 +67,9 @@ public class SlashCommands extends HttpServlet {
 
         // Only proceed if there are no errors
         if (quote.getError() == null) {
-            HttpResponse<JsonNode> response = null;
-            Gson g = new GsonBuilder().create();
-            SlackResponse msgResponse;
 
-
-            // Post request to send message
-            try {
-
-                // Try to send message with POST
-                response = Unirest.post("https://slack.com/api/chat.postMessage")
-                        .header("content-type", "application/json; charset=utf-8")
-                        .header("Authorization", "Bearer " + envVars.getTOKEN())
-                        .body(quote.toJson())
-                        .asJson();
-            } catch (UnirestException e) {
-                e.printStackTrace();
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
-            }
-
-            // Convert received response to object of POSTMessageResponse
-            msgResponse = g.fromJson(String.valueOf(response.getBody()), SlackResponse.class);
+            // Post quote to Slack
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage("https://slack.com/api/chat.postMessage", envVars.getTOKEN(), quote.toJson());
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
@@ -104,9 +85,6 @@ public class SlashCommands extends HttpServlet {
             }
 
             resp.setStatus(HttpServletResponse.SC_OK);
-
-            // Log status code
-            logger.log(Level.INFO, "Quote Status code: " + response.getStatus());
         } else {
 
             // Log error and return status code 503
@@ -133,27 +111,9 @@ public class SlashCommands extends HttpServlet {
 
         // Only proceed if there are no errors
         if (githubUser.getMessage() == null) {
-            HttpResponse<JsonNode> response = null;
-            Gson g = new GsonBuilder().create();
-            SlackResponse msgResponse;
 
-
-            // Post request to send message
-            try {
-                // Try to send message with POST
-                response = Unirest.post("https://slack.com/api/chat.postMessage")
-                        .header("content-type", "application/json; charset=utf-8")
-                        .header("Authorization", "Bearer " + envVars.getTOKEN())
-                        .body(githubUser.toJson())
-                        .asJson();
-            } catch (UnirestException e) {
-                logger.log(Level.WARNING, "Something went wrong with sending githubuser to channel: " + e.getMessage());
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
-            }
-
-            // Convert received response to object of POSTMessageResponse
-            msgResponse = g.fromJson(String.valueOf(response.getBody()), SlackResponse.class);
+            // Try to post message to slack
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage("https://slack.com/api/chat.postMessage", envVars.getTOKEN(), githubUser.toJson());
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
@@ -169,9 +129,6 @@ public class SlashCommands extends HttpServlet {
             }
 
             resp.setStatus(HttpServletResponse.SC_OK);
-
-            // Log status code
-            logger.log(Level.INFO, "Github Status code: " + response.getStatus());
         } else {
 
             // Log error and return status code 404

@@ -14,6 +14,14 @@ public class SlackResponse {
 
     }
 
+    public void setOk(boolean ok) {
+        this.ok = ok;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
     public boolean isOk() {
         return ok;
     }
