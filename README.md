@@ -1,15 +1,29 @@
 # Alfred Pennyworth (_aka Batman's Butler_)
 ## About
-This will be a bot in slack driven on java code.
+This bot is only written in Java (with Docker and MakeFile to deploy) and is a bot in slack
+where the user can get a daily quote or checkup a GitHub user and then check her/his repositories one at the time.
+
+This project uses api's from _https://quotes.rest/_ for quotes and _https://api.github.com/_ for getting github users and repositories.
 
 ## Functionality
 * `/quote` returns a daily quote
+
+![](https://i.imgur.com/J8nQb1K.png)
+
 * `/github <Username>` returns the user if they exist
+
+![](https://i.imgur.com/qZyvGVc.png)
+    
+    
+* `Select a repository` and information will be returned about it.
+
+![](https://i.imgur.com/uUqkhjK.png)
 
 ## Technologies
 * TomCat
 * Java
 * Maven
+* Docker
 
 ## You will need
 * Docker
