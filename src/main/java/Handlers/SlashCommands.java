@@ -112,6 +112,8 @@ public class SlashCommands extends HttpServlet {
         // Only proceed if there are no errors
         if (githubUser.getMessage() == null) {
 
+            System.out.println(githubUser.getRepositories().get(0).toString());
+
             // Try to post message to slack
             SlackResponse msgResponse = new GeneralFunctions().postSlackMessage("https://slack.com/api/chat.postMessage", envVars.getTOKEN(), githubUser.toJson());
 
