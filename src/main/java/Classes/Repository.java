@@ -102,6 +102,7 @@ public class Repository {
 
         text.append(String.format("_Last updated on_ %ta %tb %td %tZ %tY", updated_at, updated_at, updated_at, updated_at, updated_at));
 
+        // See Templates.md for better understanding of this json
         return String.format("{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n" +
                 "\"text\": {\n\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n}\n},\n{\n\"type\": \"context\",\n\"elements\": [\n" +
                 "{\n\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n}\n]\n}\n]\n}\n]\n}", channelID, text.toString(), html_url);

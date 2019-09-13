@@ -84,7 +84,7 @@ public class GithubUser {
             text.append(String.format(":house: %s\\n", location));
         }
 
-        // See template-githubuser.json for better understanding of this json
+        // See Templates.md for better understanding of this json
         temp = "{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n\"text\": {\n" +
                 "\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n},\n\"accessory\": {\n\"type\": \"image\",\n\"image_url\": \"%s\",\n" +
                 "\"alt_text\": \"avatar-%s\"\n}\n},\n";

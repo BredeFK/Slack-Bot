@@ -1,3 +1,38 @@
+# JSON Templates
+This is a collection of all json templates used in the project. The templates is how the json's look like when getting posted to slacks api.
+
+## Quote
+```JSON
+{
+  "channel": "<ChannelID>",
+  "attachments": [
+    {
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "_<quote>_\n\n- *<Author>*"
+          }
+        },
+        {
+          "type": "context",
+          "elements": [
+            {
+              "type": "mrkdwn",
+              "text": "*Last updated:* <date>\n:copyright: <copyright>\n"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+
+## GitHubUser
+```JSON
 {
   "channel": "<ChannelID>",
   "attachments": [
@@ -52,7 +87,8 @@
                   "emoji": true
                 },
                 "value": "value-2"
-              }
+              },
+              {...}
             ]
           }
         },
@@ -69,3 +105,33 @@
     }
   ]
 }
+```
+
+## Repository
+```JSON
+{
+  "channel": "<ChannelID>",
+  "attachments": [
+    {
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "`GitHub Repository <full_name>`\n*<name>*\n_Forked from <source.html_url> _\n```<description>```\n:small_blue_diamond:<language>\t:scales: <license.name>\t_Last updated on_ <updated_at>"
+          }
+        },
+        {
+          "type": "context",
+          "elements": [
+            {
+              "type": "mrkdwn",
+              "text": "<html_url>"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```

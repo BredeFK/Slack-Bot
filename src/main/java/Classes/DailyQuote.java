@@ -53,7 +53,7 @@ public class DailyQuote {
 
             String text = String.format("`Quote`\\n_%s_\\n\\n- *%s*", quote.getQuote(), quote.getAuthor());
 
-            // See .template-quote.json for better understanding of this json
+            // See Templates.md for better understanding of this json
             String output = "{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n" +
                     "\"text\": {\n\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n}\n},\n{\n\"type\": \"context\",\n\"elements\": [\n" +
                     "{\n\"type\": \"mrkdwn\",\n\"text\": \"*Last updated:* %s\\n:copyright: %s\\n\"\n}\n]\n}\n]\n}\n]\n}";
