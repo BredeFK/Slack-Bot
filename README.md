@@ -19,6 +19,9 @@ This project uses api's from _https://quotes.rest/_ for quotes and _https://api.
 
 ![](https://i.imgur.com/uUqkhjK.png)
 
+## Templates
+See [Templates](Templates.md) for better understanding of all `toJson()` functions.
+
 ## Technologies
 * TomCat
 * Java
