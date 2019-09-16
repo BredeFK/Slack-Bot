@@ -13,9 +13,14 @@ import java.util.logging.Logger;
 public class Index extends HttpServlet {
     private static final Logger logger = Logger.getLogger(Index.class.getName());
 
+    public Index() {
+
+    }
+
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.log(Level.INFO, "GET request on /");
+        resp.setContentType("text/html");
         resp.getWriter().write("<h1>Welcome to my index page</h1><h2>This is all</h2>");
         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
     }
