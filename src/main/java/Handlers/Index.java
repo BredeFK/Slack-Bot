@@ -21,6 +21,7 @@ public class Index extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.log(Level.INFO, "GET request on /");
         resp.setContentType("text/html");
+        resp.setCharacterEncoding("UTF-8");
         resp.getWriter().write("<h1>Welcome to my index page</h1><h2>This is all</h2>");
         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
     }
