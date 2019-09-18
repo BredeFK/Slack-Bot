@@ -30,6 +30,26 @@ This is a collection of all json templates used in the project. The templates is
 }
 ```
 
+## Mountain
+```JSON
+{
+  "channel": "<ChannelID>",
+  "attachments": [
+    {
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<text>"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
 
 ## GitHubUser
 ```JSON

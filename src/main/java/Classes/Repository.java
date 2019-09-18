@@ -85,7 +85,7 @@ public class Repository {
         text.append(String.format("`GitHub Repository %s`\\n*%s*\\n", full_name, name));
 
         if (fork) {
-            text.append(String.format("_Forked from %s _\\n", source.getHtml_url()));
+            text.append(String.format("_Forked from <%s|%s> _\\n", source.getHtml_url(), source.getFull_name()));
         }
 
         if (description != null) {

@@ -25,6 +25,8 @@ public class SlashCommands extends HttpServlet {
     // Get logger
     private static final Logger logger = Logger.getLogger(SlashCommands.class.getName());
 
+    private static final String SLACK_MSG_URL = "https://slack.com/api/chat.postMessage";
+
     // Get environment variables
     private EnvVars envVars = new EnvVars();
 
@@ -46,6 +48,12 @@ public class SlashCommands extends HttpServlet {
                 case "/github":
                     sendGithubUser(req, resp);
                     break;
+                case "/mannen":
+                    mannenFallen(req, resp);
+                    break;
+                case "/dovre":
+                    dovreFallen(req, resp);
+                    break;
                 default:
                     logger.log(Level.WARNING, "The command '" + command + "' is not valid");
                     resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -55,6 +63,80 @@ public class SlashCommands extends HttpServlet {
             logger.log(Level.WARNING, "Not authorized");
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
+    }
+
+    private void mannenFallen(HttpServletRequest req, HttpServletResponse resp) {
+        Mountain mannen = getMountainStatus("https://www.harmannenfalt.no/api");
+
+        if (mannen != null) {
+            mannen.setChannelID(envVars.getChannelGeneral());
+
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getTOKEN(), mannen.toJson("Mannen"));
+
+            // Check for errors and log them
+            if (!msgResponse.isOk()) {
+                logger.log(Level.WARNING, "MannenFallen Error: " + msgResponse.getError());
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+
+            // Check for warnings and log them
+            if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
+                logger.log(Level.WARNING, "MannenFallen Warning : " + msgResponse.getWarning());
+                return;
+            }
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            logger.log(Level.WARNING, "something went wrong with getting mannen");
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void dovreFallen(HttpServletRequest req, HttpServletResponse resp) {
+        Mountain dovre = getMountainStatus("https://www.hardovrefalt.no/api");
+
+        if (dovre != null) {
+            dovre.setChannelID(envVars.getChannelGeneral());
+
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getTOKEN(), dovre.toJson("Dovre"));
+
+            // Check for errors and log them
+            if (!msgResponse.isOk()) {
+                logger.log(Level.WARNING, "DovreFallen Error: " + msgResponse.getError());
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+
+            // Check for warnings and log them
+            if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
+                logger.log(Level.WARNING, "DovreFallen Warning : " + msgResponse.getWarning());
+                return;
+            }
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            logger.log(Level.WARNING, "something went wrong with getting dovre");
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private Mountain getMountainStatus(String URL) {
+        HttpResponse<JsonNode> response = null;
+        try {
+
+            // Get the quote in json format
+            response = Unirest.get(URL)
+                    .header("accept", "application/json")
+                    .asJson();
+        } catch (UnirestException e) {
+            logger.log(Level.WARNING, "getMountainStatus Error : " + e.getMessage());
+            return new Mountain();
+        }
+
+        // Convert from json to class
+        return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), Mountain.class);
+
     }
 
     // sendQuote Sends the daily quote to the channel
@@ -69,7 +151,7 @@ public class SlashCommands extends HttpServlet {
         if (quote.getError() == null) {
 
             // Post quote to Slack
-            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage("https://slack.com/api/chat.postMessage", envVars.getTOKEN(), quote.toJson());
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getTOKEN(), quote.toJson());
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
@@ -113,7 +195,7 @@ public class SlashCommands extends HttpServlet {
         if (githubUser.getMessage() == null) {
 
             // Try to post message to slack
-            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage("https://slack.com/api/chat.postMessage", envVars.getTOKEN(), githubUser.toJson());
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getTOKEN(), githubUser.toJson());
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {

@@ -34,7 +34,7 @@ public class TestIndex {
 
         // TODO : get the URLr dynamically
         // TODO : this method actually tests the function, but gives 0% test coverage and the server has to run
-        // TODO : Thi requires the server to run, but it can't run without the tests pass...
+        // TODO : This requires the server to run, but it can't run without the tests pass...
         /*
         HttpResponse<String> response = Unirest.get("http://23.97.209.118/").asString();
 
