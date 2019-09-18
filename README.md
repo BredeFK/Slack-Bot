@@ -10,6 +10,14 @@ This project uses api's from _https://quotes.rest/_ for quotes and _https://api.
 
 ![](https://i.imgur.com/J8nQb1K.png)
 
+* `/mannen` responds with a message if the mountain Mannen has fallen or not
+
+![](https://i.imgur.com/xZze14R.png)
+
+* `/dovre` responds with a message if the mountain Dovre has fallen or not
+
+![](https://i.imgur.com/gbR2xlm.png)
+
 * `/github <Username>` returns the user if they exist
 
 ![](https://i.imgur.com/qZyvGVc.png)
