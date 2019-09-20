@@ -1,48 +1,30 @@
 package alfred.Handlers;
 
-import alfred.Classes.GeneralFunctions;
-import org.json.JSONException;
-import org.json.JSONObject;
+import alfred.Classes.EventRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // alfred.Handlers.Event handles events from slack (https://api.slack.com/events-api)
-@WebServlet("/event")
-public class Event extends HttpServlet {
+@RestController
+public class Event {
     private static final Logger logger = Logger.getLogger(Event.class.getName());
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    @PostMapping(value = "/event")
+    public ResponseEntity<String> eventPOST(@RequestHeader("X-Slack-Signature") String header, @RequestBody EventRequest request) {
         logger.log(Level.INFO, "POST request on /event");
 
-        if (!req.getHeader("X-Slack-Signature").isEmpty()) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("content-type", "text/plain;charset=UTF-8");
 
-            // Get body from request
-            String body = new GeneralFunctions().getBody(req);
-
-            try {
-                JSONObject jsonObject = new JSONObject(body);
-
-                if (!jsonObject.isNull("challenge")) {
-                    resp.setContentType("text/plain;charset=utf-8");
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.getWriter().write(jsonObject.getString("challenge"));
-                    return;
-                }
-            } catch (JSONException e) {
-                // crash and burn
-                logger.log(Level.WARNING, "Event Error: " + e.getMessage());
-                throw new IOException("Error parsing JSON request string");
-            }
-        }
-
-        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        return new ResponseEntity<>(
+                request.getChallenge(), headers, HttpStatus.OK);
     }
 }
