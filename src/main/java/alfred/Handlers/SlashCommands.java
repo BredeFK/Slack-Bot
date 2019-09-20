@@ -1,6 +1,6 @@
-package Handlers;
+package alfred.Handlers;
 
-import Classes.*;
+import alfred.Classes.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// Handlers.SlashCommands handles commands from slack-users (https://api.slack.com/slash-commands)
+// alfred.Handlers.SlashCommands handles commands from slack-users (https://api.slack.com/slash-commands)
 @WebServlet("/slashcommands")
 public class SlashCommands extends HttpServlet {
     // Get logger
@@ -199,14 +199,14 @@ public class SlashCommands extends HttpServlet {
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
-                logger.log(Level.WARNING, "Classes.SlackResponse Error: " + msgResponse.getError());
+                logger.log(Level.WARNING, "alfred.Classes.SlackResponse Error: " + msgResponse.getError());
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                logger.log(Level.WARNING, "Classes.SlackResponse Warning : " + msgResponse.getWarning());
+                logger.log(Level.WARNING, "alfred.Classes.SlackResponse Warning : " + msgResponse.getWarning());
                 return;
             }
 
@@ -228,7 +228,7 @@ public class SlashCommands extends HttpServlet {
                     .header("accept", "application/json")
                     .asJson();
         } catch (UnirestException e) {
-            logger.log(Level.WARNING, "Classes.GithubUser Error : " + e.getMessage());
+            logger.log(Level.WARNING, "alfred.Classes.GithubUser Error : " + e.getMessage());
             return new GithubUser();
         }
 
@@ -245,7 +245,7 @@ public class SlashCommands extends HttpServlet {
                         .header("accept", "application/json")
                         .asJson();
             } catch (UnirestException e) {
-                logger.log(Level.WARNING, "Classes.GithubUser Classes.Repository Error : " + e.getMessage());
+                logger.log(Level.WARNING, "alfred.Classes.GithubUser alfred.Classes.Repository Error : " + e.getMessage());
                 return new GithubUser();
             }
 

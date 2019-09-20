@@ -1,6 +1,6 @@
-package Handlers;
+package alfred.Handlers;
 
-import Classes.*;
+import alfred.Classes.*;
 import com.google.gson.GsonBuilder;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -18,7 +18,7 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// Handlers.Interactive handles interactivity from slack users (https://api.slack.com/messaging/interactivity#components)
+// alfred.Handlers.Interactive handles interactivity from slack users (https://api.slack.com/messaging/interactivity#components)
 @WebServlet("/interactive")
 public class Interactive extends HttpServlet {
     private static final Logger logger = Logger.getLogger(Interactive.class.getName());

@@ -1,6 +1,6 @@
-package Handlers;
+package alfred.Handlers;
 
-import Classes.GeneralFunctions;
+import alfred.Classes.GeneralFunctions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// Handlers.Event handles events from slack (https://api.slack.com/events-api)
+// alfred.Handlers.Event handles events from slack (https://api.slack.com/events-api)
 @WebServlet("/event")
 public class Event extends HttpServlet {
     private static final Logger logger = Logger.getLogger(Event.class.getName());

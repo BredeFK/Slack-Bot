@@ -1,4 +1,4 @@
-package Classes;
+package alfred.Classes;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

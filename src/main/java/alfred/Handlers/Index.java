@@ -1,28 +1,30 @@
-package Handlers;
+package alfred.Handlers;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet("/")
-public class Index extends HttpServlet {
+@RestController
+public class Index {
     private static final Logger logger = Logger.getLogger(Index.class.getName());
 
     public Index() {
 
     }
 
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    @GetMapping(value = "/test")
+    public String indexGET(@RequestParam(value = "id", defaultValue = "1337") int id) {
         logger.log(Level.INFO, "GET request on /");
+        return String.format("Hello, the Id is %d", id);
+        /*
         resp.setContentType("text/html");
         resp.setCharacterEncoding("UTF-8");
         resp.getWriter().write("<h1>Welcome to my index page</h1><h2>This is all</h2>");
         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+
+         */
     }
 }

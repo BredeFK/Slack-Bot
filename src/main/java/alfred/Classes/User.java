@@ -1,4 +1,4 @@
-package Classes;
+package alfred.Classes;
 
 public class User {
     private String id;
