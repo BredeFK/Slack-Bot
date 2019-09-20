@@ -1,5 +1,8 @@
 package alfred.Handlers;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,16 +18,14 @@ public class Index {
 
     }
 
-    @GetMapping(value = "/test")
-    public String indexGET(@RequestParam(value = "id", defaultValue = "1337") int id) {
+    @GetMapping(value = "/")
+    public ResponseEntity<String> indexGET(@RequestParam(value = "id", defaultValue = "1337") int id) {
         logger.log(Level.INFO, "GET request on /");
-        return String.format("Hello, the Id is %d", id);
-        /*
-        resp.setContentType("text/html");
-        resp.setCharacterEncoding("UTF-8");
-        resp.getWriter().write("<h1>Welcome to my index page</h1><h2>This is all</h2>");
-        resp.setStatus(HttpServletResponse.SC_ACCEPTED);
 
-         */
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("content-type", "text/html;charset=UTF-8");
+
+        return new ResponseEntity<>(
+                "<h1>Welcome to my index page</h1><h2>This is all</h2>", headers, HttpStatus.ACCEPTED);
     }
 }
