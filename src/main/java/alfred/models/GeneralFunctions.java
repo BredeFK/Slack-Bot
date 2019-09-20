@@ -1,4 +1,4 @@
-package alfred.Classes;
+package alfred.models;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

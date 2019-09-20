@@ -1,4 +1,4 @@
-package alfred.Handlers;
+package alfred.controllers;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

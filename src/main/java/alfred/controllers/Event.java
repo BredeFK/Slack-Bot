@@ -1,6 +1,6 @@
-package alfred.Handlers;
+package alfred.controllers;
 
-import alfred.Classes.EventRequest;
+import alfred.models.EventRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

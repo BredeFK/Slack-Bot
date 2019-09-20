@@ -1,6 +1,6 @@
-package alfred.Handlers;
+package alfred.controllers;
 
-import alfred.Classes.*;
+import alfred.models.*;
 import com.google.gson.GsonBuilder;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;

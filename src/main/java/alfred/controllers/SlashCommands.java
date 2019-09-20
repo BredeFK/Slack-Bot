@@ -1,6 +1,6 @@
-package alfred.Handlers;
+package alfred.controllers;
 
-import alfred.Classes.*;
+import alfred.models.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
