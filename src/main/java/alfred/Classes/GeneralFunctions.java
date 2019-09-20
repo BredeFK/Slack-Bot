@@ -7,28 +7,10 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-
 public class GeneralFunctions {
 
     public GeneralFunctions() {
 
-    }
-
-    public String getBody(HttpServletRequest req) throws IOException {
-
-        StringBuilder jb = new StringBuilder();
-        String line = null;
-        BufferedReader reader = req.getReader();
-
-
-        while ((line = reader.readLine()) != null) {
-            jb.append(line);
-        }
-
-        return jb.toString();
     }
 
     public SlackResponse postSlackMessage(String postURL, String token, String message) {
