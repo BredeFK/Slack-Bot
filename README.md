@@ -38,6 +38,10 @@ See [Templates](Templates.md) for better understanding of all `toJson()` functio
 * Maven
 * Docker
 
+## Frameworks
+* Spring Boot
+* Hibernate
+
 ## You will need
 * Docker
 * maven
