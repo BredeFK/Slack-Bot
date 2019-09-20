@@ -6,65 +6,63 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // alfred.Handlers.Interactive handles interactivity from slack users (https://api.slack.com/messaging/interactivity#components)
-@WebServlet("/interactive")
-public class Interactive extends HttpServlet {
+@RestController
+public class Interactive {
     private static final Logger logger = Logger.getLogger(Interactive.class.getName());
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    @PostMapping(value = "/interactive", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public @ResponseBody
+    ResponseEntity<String> interactivePOST(HttpEntity<String> request) {
         logger.log(Level.INFO, "POST request to /interactive");
 
-
-        // Get body from request
-        String body = new GeneralFunctions().getBody(req);
-
-        resp.setStatus(HttpServletResponse.SC_OK);
-
+        if (request.getBody() == null) {
+            logger.log(Level.WARNING, "Interactive Error: request is null");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         // Source: https://stackoverflow.com/a/16453677/8883030
         // Decode x-www-form-urlencoded and remove 'payload=' at the beginning (Convert to json string)
-        String payload = null;
         try {
             // payload = URLDecoder.decode(body, StandardCharsets.UTF_8).replace("payload=", "");
-            payload = new URI(body).getPath().replace("payload=", "");
+            String payload = new URI(request.getBody()).getPath().replace("payload=", "");
+
+            // Convert json string to object of InteractiveResponse
+            InteractiveResponse response = new GsonBuilder().create().fromJson(payload, InteractiveResponse.class);
+
+            if (response.getType() == null || response.getType().isEmpty()) {
+                logger.log(Level.WARNING, "Error: Something went wrong from parsing 'x-www-form-urlencoded' to InterActiveResponse object");
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                logger.log(Level.INFO, "'x-www-form-urlencoded' was parsed successfully");
+                return respondToUserChoice(response);
+            }
+
         } catch (URISyntaxException e) {
             logger.log(Level.WARNING, "Error parsing x-www-form-urlencoded from body: " + e.getMessage());
-            return;
-        }
-
-
-        // Convert json string to object of InteractiveResponse
-        InteractiveResponse response = new GsonBuilder().create().fromJson(payload, InteractiveResponse.class);
-
-        if (response.getType() == null || response.getType().isEmpty()) {
-            logger.log(Level.WARNING, "Error: Something went wrong from parsing 'x-www-form-urlencoded' to InterActiveResponse object");
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } else {
-            logger.log(Level.INFO, "'x-www-form-urlencoded' was parsed successfully");
-            respondToUserChoice(req, resp, response);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void respondToUserChoice(HttpServletRequest req, HttpServletResponse resp, InteractiveResponse interactiveResponse) {
+    private ResponseEntity<String> respondToUserChoice(InteractiveResponse interactiveResponse) {
 
         // Check if actions List is empty
         if (interactiveResponse.getActions().isEmpty()) {
             logger.log(Level.WARNING, "Actions Error: actions list is empty!");
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         // Get environment variables
@@ -76,8 +74,7 @@ public class Interactive extends HttpServlet {
         // Check if repository object is empty
         if (repo.getName() == null || repo.getName().isEmpty()) {
             logger.log(Level.WARNING, "Repository Error: Repository object is empty");
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         repo.setChannelID(envVars.getChannelGeneral());
@@ -88,18 +85,16 @@ public class Interactive extends HttpServlet {
         // Check for errors and log them
         if (!slackResponse.isOk()) {
             logger.log(Level.WARNING, "Interactive Error: " + slackResponse.getError());
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         // Check for warnings and log them
         if (slackResponse.getWarning() != null && !slackResponse.getWarning().isEmpty()) {
             logger.log(Level.WARNING, "Interactive Warning : " + slackResponse.getWarning());
-            resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-            return;
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
         }
 
-        resp.setStatus(HttpServletResponse.SC_OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private Repository getRepository(String URL) {
