@@ -8,64 +8,63 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // alfred.Handlers.SlashCommands handles commands from slack-users (https://api.slack.com/slash-commands)
-@WebServlet("/slashcommands")
-public class SlashCommands extends HttpServlet {
+
+@RestController
+public class SlashCommands {
     // Get logger
     private static final Logger logger = Logger.getLogger(SlashCommands.class.getName());
 
     private static final String SLACK_MSG_URL = "https://slack.com/api/chat.postMessage";
 
-    // Get environment variables
-    private EnvVars envVars = new EnvVars();
+    @PostMapping(value = "/slashcommands")
+    public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,
+                                                    @RequestParam("channel_id") String channelID,
+                                                    @RequestParam("command") String command,
+                                                    @RequestParam("text") String text) {
 
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.log(Level.INFO, "POST request on /slashcommands");
 
-        if (!req.getHeader("X-Slack-Signature").isEmpty() && req.getParameter("channel_id").contains(envVars.getChannelGeneral())) {
+        // Get environment variables
+        EnvVars envVars = new EnvVars();
 
-            // get command and remove whitespace
-            String command = req.getParameter("command").replaceAll("\\s+", "");
+        // Remove all whitespace
+        channelID = channelID.replaceAll("\\s+", "");
+        command = command.replaceAll("\\s+", "");
+        text = text.replaceAll("\\s+", "");
 
-            // CHeck for valid command and respond accordingly
+        // Check for valid command and respond accordingly
+        if (channelID.equals(envVars.getChannelGeneral())) {
             switch (command) {
                 case "/quote":
-                    sendQuote(req, resp);
-                    break;
+                    return sendQuote(envVars);
                 case "/github":
-                    sendGithubUser(req, resp);
-                    break;
+                    return sendGithubUser(text, envVars);
                 case "/mannen":
-                    mannenFallen(req, resp);
-                    break;
+                    return mannenFallen(envVars);
                 case "/dovre":
-                    dovreFallen(req, resp);
-                    break;
+                    return dovreFallen(envVars);
                 default:
                     logger.log(Level.WARNING, "The command '" + command + "' is not valid");
-                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    break;
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } else {
-            logger.log(Level.WARNING, "Not authorized");
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
+
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    private void mannenFallen(HttpServletRequest req, HttpServletResponse resp) {
+    private ResponseEntity<String> mannenFallen(EnvVars envVars) {
         Mountain mannen = getMountainStatus("https://www.harmannenfalt.no/api");
 
         if (mannen != null) {
@@ -76,24 +75,23 @@ public class SlashCommands extends HttpServlet {
             // Check for errors and log them
             if (!msgResponse.isOk()) {
                 logger.log(Level.WARNING, "MannenFallen Error: " + msgResponse.getError());
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
                 logger.log(Level.WARNING, "MannenFallen Warning : " + msgResponse.getWarning());
-                return;
+                return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
-            resp.setStatus(HttpServletResponse.SC_OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             logger.log(Level.WARNING, "something went wrong with getting mannen");
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void dovreFallen(HttpServletRequest req, HttpServletResponse resp) {
+    private ResponseEntity<String> dovreFallen(EnvVars envVars) {
         Mountain dovre = getMountainStatus("https://www.hardovrefalt.no/api");
 
         if (dovre != null) {
@@ -104,20 +102,19 @@ public class SlashCommands extends HttpServlet {
             // Check for errors and log them
             if (!msgResponse.isOk()) {
                 logger.log(Level.WARNING, "DovreFallen Error: " + msgResponse.getError());
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
                 logger.log(Level.WARNING, "DovreFallen Warning : " + msgResponse.getWarning());
-                return;
+                return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
-            resp.setStatus(HttpServletResponse.SC_OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             logger.log(Level.WARNING, "something went wrong with getting dovre");
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -140,7 +137,7 @@ public class SlashCommands extends HttpServlet {
     }
 
     // sendQuote Sends the daily quote to the channel
-    private void sendQuote(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private ResponseEntity<String> sendQuote(EnvVars envVars) {
         // Get the quote of the day
         DailyQuote quote = getQuoteOfTheDay();
 
@@ -156,34 +153,27 @@ public class SlashCommands extends HttpServlet {
             // Check for errors and log them
             if (!msgResponse.isOk()) {
                 logger.log(Level.WARNING, "Error: " + msgResponse.getError());
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
                 logger.log(Level.WARNING, "Warning : " + msgResponse.getWarning());
-                return;
+                return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
-            resp.setStatus(HttpServletResponse.SC_OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
 
-            // Log error and return status code 503
+            // Log error and return status code 500
             logger.log(Level.WARNING, "Error " + quote.getError().toString());
-            resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            //resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     // sendGithubUser sends the github user to the channel
-    private void sendGithubUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String username = req.getParameter("text");
-
-        if (username == null || username.isEmpty()) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
+    private ResponseEntity<String> sendGithubUser(String username, EnvVars envVars) {
 
         // Get the quote of the day
         GithubUser githubUser = getGithubUser(username);
@@ -200,22 +190,21 @@ public class SlashCommands extends HttpServlet {
             // Check for errors and log them
             if (!msgResponse.isOk()) {
                 logger.log(Level.WARNING, "alfred.Classes.SlackResponse Error: " + msgResponse.getError());
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
                 logger.log(Level.WARNING, "alfred.Classes.SlackResponse Warning : " + msgResponse.getWarning());
-                return;
+                return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
-            resp.setStatus(HttpServletResponse.SC_OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
 
             // Log error and return status code 404
             logger.log(Level.WARNING, "Error " + githubUser.getMessage());
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
