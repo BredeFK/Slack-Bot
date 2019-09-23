@@ -209,6 +209,9 @@ public class SlashCommands {
     }
 
     private GithubUser getGithubUser(String username) {
+
+        // TODO : check db if today's quote is fetched or else get from API
+
         HttpResponse<JsonNode> response = null;
 
         try {

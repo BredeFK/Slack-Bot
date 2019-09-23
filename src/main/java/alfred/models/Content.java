@@ -17,6 +17,13 @@ public class Content {
         return quotes;
     }
 
+    public Quote getSingleQuote() throws Exception {
+        if (!quotes.isEmpty())
+            return quotes.get(0);
+
+        throw new Exception("Error: Quotes array is empty");
+    }
+
     @Override
     public String toString() {
         return String.format("%ncopyright: %s%nquotes: %s", copyright, quotes.get(0).toString());

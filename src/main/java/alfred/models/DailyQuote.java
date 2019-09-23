@@ -1,16 +1,25 @@
 package alfred.models;
 
-import java.text.ParseException;
+import javax.persistence.*;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+@Entity
 public class DailyQuote {
 
+    // Auto generated ID code found here: https://gist.github.com/thjanssen/7ad1f141fe2f5326596dc09c932e8ccc#file-author-java
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false, nullable = false)
+    private long id;
+
+    @Embedded // TODO : Change this
     private Error error;
+
+    @Embedded // TODO : Change this
     private Content contents;
+
+    @Transient // Ignore this as it probably will change later
     private String channelID;
-    private static final Logger logger = Logger.getLogger(DailyQuote.class.getName());
 
     public DailyQuote() {
 
@@ -37,31 +46,26 @@ public class DailyQuote {
     // Converts object to formatted json that can be sent to Slacks "Block Kit Builder" https://api.slack.com/tools/block-kit-builder
     public String toJson() {
 
-        if (!contents.getQuotes().isEmpty()) {
-            Quote quote = contents.getQuotes().get(0);
+        Quote quote = null;
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-            String formatDate = "";
+        String formatDate = "";
 
-            try {
-                formatDate = sdf.format(quote.getDate());
-            } catch (ParseException e) {
-                logger.log(Level.WARNING, "Error " + e.getMessage());
-                return "";
-            }
-
-            String text = String.format("`Quote`\\n_%s_\\n\\n- *%s*", quote.getQuote(), quote.getAuthor());
-
-            // See Templates.md for better understanding of this json
-            String output = "{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n" +
-                    "\"text\": {\n\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n}\n},\n{\n\"type\": \"context\",\n\"elements\": [\n" +
-                    "{\n\"type\": \"mrkdwn\",\n\"text\": \"*Last updated:* %s\\n:copyright: %s\\n\"\n}\n]\n}\n]\n}\n]\n}";
-
-            return String.format(output, channelID, text, formatDate, contents.getCopyright());
-        } else {
-            logger.log(Level.WARNING, "Error : contents is empty!");
-            return "";
+        try {
+            quote = contents.getSingleQuote();
+            formatDate = sdf.format(quote.getDate());
+        } catch (Exception e) {
+            return e.getMessage();
         }
+
+        String text = String.format("`Quote`\\n_%s_\\n\\n- *%s*", quote.getQuote(), quote.getAuthor());
+
+        // See Templates.md for better understanding of this json
+        String output = "{\n\"channel\": \"%s\",\n\"attachments\": [\n{\n\"blocks\": [\n{\n\"type\": \"section\",\n" +
+                "\"text\": {\n\"type\": \"mrkdwn\",\n\"text\": \"%s\"\n}\n},\n{\n\"type\": \"context\",\n\"elements\": [\n" +
+                "{\n\"type\": \"mrkdwn\",\n\"text\": \"*Last updated:* %s\\n:copyright: %s\\n\"\n}\n]\n}\n]\n}\n]\n}";
+
+        return String.format(output, channelID, text, formatDate, contents.getCopyright());
     }
 }
