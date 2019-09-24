@@ -25,6 +25,10 @@ public class DailyQuote {
 
     }
 
+    public long getId() {
+        return id;
+    }
+
     public Error getError() {
         return error;
     }
