@@ -1,6 +1,7 @@
 package alfred.controllers;
 
 import alfred.models.*;
+import alfred.services.DailyQuoteService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -8,6 +9,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +29,9 @@ public class SlashCommands {
     private static final Logger logger = Logger.getLogger(SlashCommands.class.getName());
 
     private static final String SLACK_MSG_URL = "https://slack.com/api/chat.postMessage";
+
+    @Autowired
+    private DailyQuoteService dqService;
 
     @PostMapping(value = "/slashcommands")
     public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,

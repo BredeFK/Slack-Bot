@@ -15,7 +15,7 @@ public class DailyQuote {
     @OneToOne
     private Error error;
 
-    @Embedded // TODO : Change this
+    @Embedded
     private Content contents;
 
     @Transient // Ignore this as it probably will change later

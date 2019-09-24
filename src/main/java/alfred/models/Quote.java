@@ -2,6 +2,7 @@ package alfred.models;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,19 +12,31 @@ import java.util.Date;
 public class Quote {
 
     @Id
-    private String id;
+    private long dbID;
 
     private String quote;
     private String length;
     private String author;
+
+    @Transient
     private ArrayList<String> tags;
+
     private String category;
     private String date;
     private String permalink;
     private String title;
     private String background;
+    private String id;
 
     public Quote() {
+    }
+
+    public long getDbID() {
+        return dbID;
+    }
+
+    public void setDbID(long dbID) {
+        this.dbID = dbID;
     }
 
     public String getQuote() {

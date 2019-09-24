@@ -1,10 +1,13 @@
 package alfred.models;
 
-import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 import java.util.ArrayList;
 
 public class Content {
+
     private String copyright;
+
+    @Transient
     private ArrayList<Quote> quotes;
 
     public Content() {
@@ -18,7 +21,6 @@ public class Content {
         return quotes;
     }
 
-    @OneToOne
     public Quote getSingleQuote() throws Exception {
         if (!quotes.isEmpty())
             return quotes.get(0);
