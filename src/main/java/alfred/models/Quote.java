@@ -1,11 +1,17 @@
 package alfred.models;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+@Entity
 public class Quote {
+
+    @Id
+    private String id;
 
     private String quote;
     private String length;
@@ -16,7 +22,6 @@ public class Quote {
     private String permalink;
     private String title;
     private String background;
-    private String id;
 
     public Quote() {
     }

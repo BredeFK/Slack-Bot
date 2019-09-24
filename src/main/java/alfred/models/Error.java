@@ -1,8 +1,16 @@
 package alfred.models;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Error {
 
+    @Id
+    @Column(name = "id", updatable = false, nullable = false)
     private int code;
+
     private String message;
 
     public Error() {

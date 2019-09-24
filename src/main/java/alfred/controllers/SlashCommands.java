@@ -162,6 +162,7 @@ public class SlashCommands {
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
+
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
 

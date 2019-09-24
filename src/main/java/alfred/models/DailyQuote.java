@@ -12,7 +12,7 @@ public class DailyQuote {
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
 
-    @Embedded // TODO : Change this
+    @OneToOne
     private Error error;
 
     @Embedded // TODO : Change this
