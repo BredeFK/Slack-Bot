@@ -1,6 +1,7 @@
 package alfred.controllers;
 
 import alfred.models.*;
+import alfred.services.ContentService;
 import alfred.services.DailyQuoteService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,6 +33,9 @@ public class SlashCommands {
 
     @Autowired
     private DailyQuoteService dqService;
+
+    @Autowired
+    private ContentService contentService;
 
     @PostMapping(value = "/slashcommands")
     public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,
@@ -167,6 +171,9 @@ public class SlashCommands {
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
+            // Add quote to DB
+            // dqService.add(quote);
+            System.out.println(String.format("Id is %d, ", contentService.add(quote.getContents())));
 
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
@@ -216,8 +223,6 @@ public class SlashCommands {
 
     private GithubUser getGithubUser(String username) {
 
-        // TODO : check db if today's quote is fetched or else get from API
-
         HttpResponse<JsonNode> response = null;
 
         try {
@@ -259,6 +264,8 @@ public class SlashCommands {
     // getQuoteOfTheDay returns the quote of the day in an object
     private DailyQuote getQuoteOfTheDay() {
 
+        // TODO : check db if today's quote is fetched or else get from API
+        /*
         HttpResponse<JsonNode> response = null;
         try {
 
@@ -271,7 +278,41 @@ public class SlashCommands {
             return new DailyQuote();
         }
 
+         */
+
         // Convert from json to class
-        return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), DailyQuote.class);
+        //return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), DailyQuote.class);
+        return new GsonBuilder().create().fromJson(testingJson(), DailyQuote.class);
+    }
+
+    // TODO remove after testing is done
+    private String testingJson() {
+        return "{\n" +
+                "  \"success\": {\n" +
+                "    \"total\": 1\n" +
+                "  },\n" +
+                "  \"contents\": {\n" +
+                "    \"quotes\": [\n" +
+                "      {\n" +
+                "        \"quote\": \"He who is not courageous enough to take risks will accomplish nothing in life.\",\n" +
+                "        \"length\": \"78\",\n" +
+                "        \"author\": \"Mohamad Ali\",\n" +
+                "        \"tags\": [\n" +
+                "          \"courage\",\n" +
+                "          \"inspire\",\n" +
+                "          \"risk\",\n" +
+                "          \"tod\"\n" +
+                "        ],\n" +
+                "        \"category\": \"inspire\",\n" +
+                "        \"date\": \"2019-09-25\",\n" +
+                "        \"permalink\": \"https://theysaidso.com/quote/mohamad-ali-he-who-is-not-courageous-enough-to-take-risks-will-accomplish-nothin\",\n" +
+                "        \"title\": \"Inspiring Quote of the day\",\n" +
+                "        \"background\": \"https://theysaidso.com/img/bgs/man_on_the_mountain.jpg\",\n" +
+                "        \"id\": \"ifuqTGVbNWPSJIzhrGQakQeF\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"copyright\": \"2017-19 theysaidso.com\"\n" +
+                "  }\n" +
+                "}";
     }
 }

@@ -1,9 +1,15 @@
 package alfred.models;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Transient;
 import java.util.ArrayList;
 
+@Entity
 public class Content {
+
+    @Id
+    private long id;
 
     private String copyright;
 
@@ -15,6 +21,10 @@ public class Content {
 
     public String getCopyright() {
         return copyright;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public ArrayList<Quote> getQuotes() {
