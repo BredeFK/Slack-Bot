@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -149,8 +151,17 @@ public class SlashCommands {
 
     // sendQuote Sends the daily quote to the channel
     private ResponseEntity<String> sendQuote(EnvVars envVars) {
-        // Get the quote of the day
-        DailyQuote quote = getQuoteOfTheDay();
+
+        // Try to get the quote of the day
+        DailyQuote quote = null;
+        try {
+            quote = getQuoteOfTheDay();
+        } catch (Exception e) {
+
+            // Log error and return correct response
+            logger.log(Level.WARNING, "GetQuoteOfTheDay Error: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         // Set to correct channelID
         quote.setChannelID(envVars.getChannelGeneral());
@@ -173,22 +184,7 @@ public class SlashCommands {
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
-            try {
-                // Convert object to be DB friendly
-                DBquote dBquote = new DBquote(quote);
-
-                // Add to db
-                dBquoteService.add(dBquote);
-
-                // Log event
-                logger.log(Level.INFO, String.format("New DailyQuote is added to DB with ID %d", dBquote.getId()));
-
-                return new ResponseEntity<>(HttpStatus.OK);
-
-            } catch (Exception e) {
-                logger.log(Level.WARNING, String.format("DBquote Error: %s", e.getMessage()));
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } else {
 
@@ -276,58 +272,47 @@ public class SlashCommands {
     }
 
     // getQuoteOfTheDay returns the quote of the day in an object
-    private DailyQuote getQuoteOfTheDay() {
+    private DailyQuote getQuoteOfTheDay() throws Exception {
 
-        // TODO : check db if today's quote is fetched or else get from API
+        List<DBquote> dBquotes = dBquoteService.list();
 
-        return new GsonBuilder().create().fromJson(String.valueOf(testingJson()), DailyQuote.class);
-        /*
-        try {
+        DBquote dBquote = null;
+        SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
 
-            // Get the quote in json format
-            HttpResponse<JsonNode> response = Unirest.get("https://quotes.rest/qod")
-                    .header("accept", "application/json")
-                    .asJson();
-
-            // Convert from json to class
-            return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), DailyQuote.class);
-
-        } catch (UnirestException e) {
-            logger.log(Level.WARNING, "Error : " + e.getMessage());
-            return new DailyQuote();
+        // Check if there already is a quote from today in the db
+        for (DBquote quote : dBquotes) {
+            if (fmt.format(quote.getQuote().getDate()).equals(fmt.format(new Date()))) {
+                dBquote = quote;
+            }
         }
 
-         */
-    }
+        // Return the quote from db if it's from today
+        if (dBquote != null) {
+            logger.log(Level.INFO, "Using quote of the day from DB");
+            return new DailyQuote(dBquote);
+        }
 
-    // TODO remove after testing is done
-    private String testingJson() {
-        return "{\n" +
-                "  \"success\": {\n" +
-                "    \"total\": 1\n" +
-                "  },\n" +
-                "  \"contents\": {\n" +
-                "    \"quotes\": [\n" +
-                "      {\n" +
-                "        \"quote\": \"He who is not courageous enough to take risks will accomplish nothing in life.\",\n" +
-                "        \"length\": \"78\",\n" +
-                "        \"author\": \"Mohamad Ali\",\n" +
-                "        \"tags\": [\n" +
-                "          \"courage\",\n" +
-                "          \"inspire\",\n" +
-                "          \"risk\",\n" +
-                "          \"tod\"\n" +
-                "        ],\n" +
-                "        \"category\": \"inspire\",\n" +
-                "        \"date\": \"2019-09-25\",\n" +
-                "        \"permalink\": \"https://theysaidso.com/quote/mohamad-ali-he-who-is-not-courageous-enough-to-take-risks-will-accomplish-nothin\",\n" +
-                "        \"title\": \"Inspiring Quote of the day\",\n" +
-                "        \"background\": \"https://theysaidso.com/img/bgs/man_on_the_mountain.jpg\",\n" +
-                "        \"id\": \"ifuqTGVbNWPSJIzhrGQakQeF\"\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"copyright\": \"2017-19 theysaidso.com\"\n" +
-                "  }\n" +
-                "}";
+
+        // If the quote wasn't in db, then try to get the quote from external API
+
+        // Get the quote in json format
+        HttpResponse<JsonNode> response = Unirest.get("https://quotes.rest/qod")
+                .header("accept", "application/json")
+                .asJson();
+
+        // Convert response to DailyQuote Object
+        DailyQuote dailyQuote = new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), DailyQuote.class);
+
+        // Convert DailyQuote to DBquote to add to db
+        dBquote = new DBquote(dailyQuote);
+
+        // Add to db
+        dBquoteService.add(dBquote);
+
+        // Log events
+        logger.log(Level.INFO, String.format("New DailyQuote is added to DB with ID %d", dBquote.getId()));
+        logger.log(Level.INFO, "Using quote of the day from external API");
+
+        return dailyQuote;
     }
 }

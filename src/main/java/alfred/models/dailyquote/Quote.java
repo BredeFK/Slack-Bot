@@ -1,7 +1,6 @@
 package alfred.models.dailyquote;
 
 import javax.persistence.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +21,7 @@ public class Quote {
     private List<String> tags;
 
     private String category;
-    private String date;
+    private Date date;
     private String permalink;
     private String title;
     private String background;
@@ -59,9 +58,8 @@ public class Quote {
         return category;
     }
 
-    public Date getDate() throws ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        return format.parse(date);
+    public Date getDate() {
+        return date;
     }
 
     public String getPermalink() {
@@ -82,7 +80,8 @@ public class Quote {
 
     @Override
     public String toString() {
+        SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
         return String.format("%nquote: %s%nlength: %s%nauthor %s%ncategory: %s%ndate: %s%npermalink: %s%ntitle: %s%nbackground: %s%nid: %s",
-                quote, length, author, category, date, permalink, title, background, id);
+                quote, length, author, category, fmt.format(date), permalink, title, background, id);
     }
 }

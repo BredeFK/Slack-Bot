@@ -20,12 +20,10 @@ public class DailyQuote {
     }
 
     // Constructor for converting DB object to DailyQuote Object
-    public DailyQuote(DBquote dBquote, String channelID) {
+    public DailyQuote(DBquote dBquote) {
         this.id = dBquote.getId();
         this.error = dBquote.getError();
         this.contents = new Content(dBquote);
-
-        this.channelID = channelID;
     }
 
     public long getId() {
