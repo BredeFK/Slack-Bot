@@ -1,4 +1,4 @@
-package alfred.models;
+package alfred.models.dailyquote;
 
 import javax.persistence.*;
 import java.text.ParseException;

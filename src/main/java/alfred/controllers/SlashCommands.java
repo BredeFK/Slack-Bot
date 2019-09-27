@@ -1,6 +1,12 @@
 package alfred.controllers;
 
-import alfred.models.*;
+import alfred.models.dailyquote.DailyQuote;
+import alfred.models.db.DBquote;
+import alfred.models.general.EnvVars;
+import alfred.models.github.GithubUser;
+import alfred.models.github.Repository;
+import alfred.models.mannendovre.Mountain;
+import alfred.models.slack.SlackResponse;
 import alfred.services.DBquoteService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -1,4 +1,4 @@
-package alfred.models;
+package alfred.models.slack;
 
 import java.util.ArrayList;
 

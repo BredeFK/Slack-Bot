@@ -1,4 +1,6 @@
-package alfred.models;
+package alfred.models.dailyquote;
+
+import alfred.models.general.Error;
 
 import javax.persistence.*;
 import java.text.SimpleDateFormat;

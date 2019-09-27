@@ -1,4 +1,4 @@
-package alfred.models;
+package alfred.models.mannendovre;
 
 public class Mountain {
 

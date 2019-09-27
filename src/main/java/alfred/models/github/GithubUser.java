@@ -1,4 +1,4 @@
-package alfred.models;
+package alfred.models.github;
 
 import java.util.ArrayList;
 

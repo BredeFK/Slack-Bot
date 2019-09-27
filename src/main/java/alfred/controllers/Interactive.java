@@ -1,6 +1,9 @@
 package alfred.controllers;
 
-import alfred.models.*;
+import alfred.models.general.EnvVars;
+import alfred.models.github.Repository;
+import alfred.models.slack.InteractiveResponse;
+import alfred.models.slack.SlackResponse;
 import com.google.gson.GsonBuilder;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;

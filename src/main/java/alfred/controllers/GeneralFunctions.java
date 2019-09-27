@@ -1,6 +1,6 @@
 package alfred.controllers;
 
-import alfred.models.SlackResponse;
+import alfred.models.slack.SlackResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mashape.unirest.http.HttpResponse;

@@ -1,6 +1,6 @@
 package alfred.repositories;
 
-import alfred.models.DBquote;
+import alfred.models.db.DBquote;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

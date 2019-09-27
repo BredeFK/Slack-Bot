@@ -1,4 +1,8 @@
-package alfred.models;
+package alfred.models.db;
+
+import alfred.models.dailyquote.DailyQuote;
+import alfred.models.dailyquote.Quote;
+import alfred.models.general.Error;
 
 import javax.persistence.*;
 

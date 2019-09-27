@@ -1,6 +1,6 @@
 package alfred.controllers;
 
-import alfred.models.EventRequest;
+import alfred.models.slack.EventRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

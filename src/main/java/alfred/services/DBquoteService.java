@@ -1,6 +1,6 @@
 package alfred.services;
 
-import alfred.models.DBquote;
+import alfred.models.db.DBquote;
 import alfred.repositories.DBquoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

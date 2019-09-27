@@ -1,4 +1,4 @@
-package alfred.models;
+package alfred.models.slack;
 
 public class EventRequest {
     private String token;

@@ -1,4 +1,4 @@
-package alfred.models;
+package alfred.models.general;
 
 public class EnvVars {
     private final String TOKEN;
