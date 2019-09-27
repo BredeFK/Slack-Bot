@@ -3,8 +3,8 @@ package alfred.models.dailyquote;
 import javax.persistence.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Quote {
@@ -17,8 +17,9 @@ public class Quote {
     private String length;
     private String author;
 
-    @Transient
-    private ArrayList<String> tags;
+    // Switched from ArrayList to List so it would work: https://discourse.hibernate.org/t/map-array-list-on-particular-column/610/2
+    @ElementCollection
+    private List<String> tags;
 
     private String category;
     private String date;
@@ -50,7 +51,7 @@ public class Quote {
         return author;
     }
 
-    public ArrayList<String> getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
