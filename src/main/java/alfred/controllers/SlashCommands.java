@@ -1,8 +1,7 @@
 package alfred.controllers;
 
 import alfred.models.*;
-import alfred.services.ContentService;
-import alfred.services.DailyQuoteService;
+import alfred.services.DBquoteService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -31,11 +30,8 @@ public class SlashCommands {
 
     private static final String SLACK_MSG_URL = "https://slack.com/api/chat.postMessage";
 
-    @Autowired
-    private DailyQuoteService dqService;
-
-    @Autowired
-    private ContentService contentService;
+    @Autowired // Service for DB
+    private DBquoteService dBquoteService;
 
     @PostMapping(value = "/slashcommands")
     public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,
@@ -171,9 +167,17 @@ public class SlashCommands {
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
-            // Add quote to DB
-            // dqService.add(quote);
-            System.out.println(String.format("Id is %d, ", contentService.add(quote.getContents())));
+            try {
+                // Convert object to be DB friendly
+                DBquote dBquote = new DBquote(quote);
+
+                // Add to db and print ID
+                System.out.println(String.format("ID is: %d", dBquoteService.add(dBquote)));
+
+
+            } catch (Exception e) {
+                logger.log(Level.WARNING, String.format("DBquote Error: %s", e.getMessage()));
+            }
 
             return new ResponseEntity<>(HttpStatus.OK);
         } else {

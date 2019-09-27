@@ -1,8 +1,6 @@
 package alfred.models;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,6 +10,7 @@ import java.util.Date;
 public class Quote {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long dbID;
 
     private String quote;
