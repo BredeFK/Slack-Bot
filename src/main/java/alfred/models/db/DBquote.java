@@ -15,6 +15,7 @@ public class DBquote {
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
 
+    // Cascade error solved from this source: https://stackoverflow.com/a/2302814/8883030
     @OneToOne(cascade = CascadeType.ALL)
     private Error error;
 

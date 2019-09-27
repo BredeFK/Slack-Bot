@@ -177,15 +177,19 @@ public class SlashCommands {
                 // Convert object to be DB friendly
                 DBquote dBquote = new DBquote(quote);
 
-                // Add to db and print ID
-                System.out.println(String.format("ID is: %d", dBquoteService.add(dBquote)));
+                // Add to db
+                dBquoteService.add(dBquote);
 
+                // Log event
+                logger.log(Level.INFO, String.format("New DailyQuote is added to DB with ID %d", dBquote.getId()));
+
+                return new ResponseEntity<>(HttpStatus.OK);
 
             } catch (Exception e) {
                 logger.log(Level.WARNING, String.format("DBquote Error: %s", e.getMessage()));
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            return new ResponseEntity<>(HttpStatus.OK);
         } else {
 
             // Log error and return status code 500
@@ -275,24 +279,25 @@ public class SlashCommands {
     private DailyQuote getQuoteOfTheDay() {
 
         // TODO : check db if today's quote is fetched or else get from API
+
+        return new GsonBuilder().create().fromJson(String.valueOf(testingJson()), DailyQuote.class);
         /*
-        HttpResponse<JsonNode> response = null;
         try {
 
             // Get the quote in json format
-            response = Unirest.get("https://quotes.rest/qod")
+            HttpResponse<JsonNode> response = Unirest.get("https://quotes.rest/qod")
                     .header("accept", "application/json")
                     .asJson();
+
+            // Convert from json to class
+            return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), DailyQuote.class);
+
         } catch (UnirestException e) {
             logger.log(Level.WARNING, "Error : " + e.getMessage());
             return new DailyQuote();
         }
 
          */
-
-        // Convert from json to class
-        //return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), DailyQuote.class);
-        return new GsonBuilder().create().fromJson(testingJson(), DailyQuote.class);
     }
 
     // TODO remove after testing is done

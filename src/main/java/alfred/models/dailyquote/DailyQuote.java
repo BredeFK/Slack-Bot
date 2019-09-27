@@ -1,5 +1,6 @@
 package alfred.models.dailyquote;
 
+import alfred.models.db.DBquote;
 import alfred.models.general.Error;
 
 import java.text.SimpleDateFormat;
@@ -11,11 +12,20 @@ public class DailyQuote {
     private Error error;
 
     private Content contents;
-    
+
     private String channelID;
 
     public DailyQuote() {
 
+    }
+
+    // Constructor for converting DB object to DailyQuote Object
+    public DailyQuote(DBquote dBquote, String channelID) {
+        this.id = dBquote.getId();
+        this.error = dBquote.getError();
+        this.contents = new Content(dBquote);
+
+        this.channelID = channelID;
     }
 
     public long getId() {

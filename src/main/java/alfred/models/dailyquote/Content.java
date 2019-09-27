@@ -1,10 +1,10 @@
 package alfred.models.dailyquote;
 
+import alfred.models.db.DBquote;
+
 import java.util.ArrayList;
 
 public class Content {
-
-    private long id;
 
     private String copyright;
 
@@ -13,12 +13,15 @@ public class Content {
     public Content() {
     }
 
-    public String getCopyright() {
-        return copyright;
+    public Content(DBquote dBquote) {
+        this.copyright = dBquote.getCopyright();
+
+        this.quotes = new ArrayList<>();
+        this.quotes.add(dBquote.getQuote());
     }
 
-    public long getId() {
-        return id;
+    public String getCopyright() {
+        return copyright;
     }
 
     public ArrayList<Quote> getQuotes() {
