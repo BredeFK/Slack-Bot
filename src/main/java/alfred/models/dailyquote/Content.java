@@ -1,19 +1,13 @@
 package alfred.models.dailyquote;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
 import java.util.ArrayList;
 
-@Entity
 public class Content {
 
-    @Id
     private long id;
 
     private String copyright;
 
-    @Transient
     private ArrayList<Quote> quotes;
 
     public Content() {

@@ -2,25 +2,16 @@ package alfred.models.dailyquote;
 
 import alfred.models.general.Error;
 
-import javax.persistence.*;
 import java.text.SimpleDateFormat;
 
-@Entity
 public class DailyQuote {
 
-    // Auto generated ID code found here: https://gist.github.com/thjanssen/7ad1f141fe2f5326596dc09c932e8ccc#file-author-java
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false, nullable = false)
     private long id;
 
-    @OneToOne
     private Error error;
 
-    @Embedded
     private Content contents;
-
-    @Transient // Ignore this as it probably will change later
+    
     private String channelID;
 
     public DailyQuote() {

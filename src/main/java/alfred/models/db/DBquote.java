@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Entity
 public class DBquote {
 
+    // Auto generated ID code found here: https://gist.github.com/thjanssen/7ad1f141fe2f5326596dc09c932e8ccc#file-author-java
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
