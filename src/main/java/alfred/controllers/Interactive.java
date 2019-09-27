@@ -71,8 +71,11 @@ public class Interactive {
         // Get environment variables
         EnvVars envVars = new EnvVars();
 
+        String prefixURL = "https://api.github.com/repos/";
+        String githubRepoName = interactiveResponse.getActions().get(0).getSelected_option().getValue();
+
         // Get repository from api url
-        Repository repo = getRepository(interactiveResponse.getActions().get(0).getSelected_option().getValue());
+        Repository repo = getRepository(prefixURL + githubRepoName);
 
         // Check if repository object is empty
         if (repo.getName() == null || repo.getName().isEmpty()) {
@@ -101,6 +104,7 @@ public class Interactive {
     }
 
     private Repository getRepository(String URL) {
+        System.out.println(URL);
         HttpResponse<JsonNode> response = null;
         try {
 

@@ -108,7 +108,7 @@ public class GithubUser {
                 String language = (repo.getLanguage() != null) ? "(" + repo.getLanguage() + ")" : "(N/A)";
 
                 // Append repo json info
-                output.append(String.format(temp, repo.getName(), language, repo.getUrl()));
+                output.append(String.format(temp, repo.getName(), language, repo.getName()));
             }
 
             // Append closing brackets

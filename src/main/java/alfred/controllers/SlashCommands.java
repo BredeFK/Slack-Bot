@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -263,8 +264,10 @@ public class SlashCommands {
 
             // Get set the repositories to the user
             // I got the solution from this: https://stackoverflow.com/a/12384156/8883030
-            user.setRepositories(g.fromJson(String.valueOf(response.getBody()), new TypeToken<List<Repository>>() {
-            }.getType()));
+            ArrayList<Repository> repositories = g.fromJson(String.valueOf(response.getBody()), new TypeToken<List<Repository>>() {
+            }.getType());
+
+            user.setRepositories(repositories);
         }
 
         return user;
