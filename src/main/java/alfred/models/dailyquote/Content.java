@@ -28,11 +28,11 @@ public class Content {
         return quotes;
     }
 
-    public Quote getSingleQuote() throws Exception {
+    public Quote getSingleQuote() {
         if (!quotes.isEmpty())
             return quotes.get(0);
 
-        throw new Exception("Error: Quotes array is empty");
+        return new Quote();
     }
 
     @Override

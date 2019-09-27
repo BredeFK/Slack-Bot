@@ -1,13 +1,12 @@
 package alfred.controllers;
 
 import alfred.models.dailyquote.DailyQuote;
-import alfred.models.db.DBquote;
 import alfred.models.general.EnvVars;
 import alfred.models.github.GithubUser;
 import alfred.models.github.Repository;
 import alfred.models.mannendovre.Mountain;
 import alfred.models.slack.SlackResponse;
-import alfred.services.DBquoteService;
+import alfred.services.DailyQuoteService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -39,7 +38,7 @@ public class SlashCommands {
     private static final String SLACK_MSG_URL = "https://slack.com/api/chat.postMessage";
 
     @Autowired // Service for DB
-    private DBquoteService dBquoteService;
+    private DailyQuoteService dailyQuoteService;
 
     @PostMapping(value = "/slashcommands")
     public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,
@@ -274,22 +273,22 @@ public class SlashCommands {
     // getQuoteOfTheDay returns the quote of the day in an object
     private DailyQuote getQuoteOfTheDay() throws Exception {
 
-        List<DBquote> dBquotes = dBquoteService.list();
+        List<DailyQuote> dailyQuotes = dailyQuoteService.list();
 
-        DBquote dBquote = null;
+        DailyQuote quote = null;
         SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
 
         // Check if there already is a quote from today in the db
-        for (DBquote quote : dBquotes) {
-            if (fmt.format(quote.getQuote().getDate()).equals(fmt.format(new Date()))) {
-                dBquote = quote;
+        for (DailyQuote dailyQuote : dailyQuotes) {
+            if (fmt.format(dailyQuote.getContents().getSingleQuote().getDate()).equals(fmt.format(new Date()))) {
+                quote = dailyQuote;
             }
         }
 
         // Return the quote from db if it's from today
-        if (dBquote != null) {
+        if (quote != null) {
             logger.log(Level.INFO, "Using quote of the day from DB");
-            return new DailyQuote(dBquote);
+            return quote;
         }
 
 
@@ -303,14 +302,11 @@ public class SlashCommands {
         // Convert response to DailyQuote Object
         DailyQuote dailyQuote = new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), DailyQuote.class);
 
-        // Convert DailyQuote to DBquote to add to db
-        dBquote = new DBquote(dailyQuote);
-
-        // Add to db
-        dBquoteService.add(dBquote);
+        // Add to db and get new id
+        long id = dailyQuoteService.add(dailyQuote);
 
         // Log events
-        logger.log(Level.INFO, String.format("New DailyQuote is added to DB with ID %d", dBquote.getId()));
+        logger.log(Level.INFO, String.format("New DailyQuote is added to DB with ID %d", id));
         logger.log(Level.INFO, "Using quote of the day from external API");
 
         return dailyQuote;

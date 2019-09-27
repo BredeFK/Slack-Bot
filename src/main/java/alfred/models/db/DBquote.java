@@ -25,7 +25,7 @@ public class DBquote {
     private String copyright;
 
 
-    public DBquote(DailyQuote dailyQuote) throws Exception {
+    public DBquote(DailyQuote dailyQuote) {
         this.error = dailyQuote.getError();
         this.quote = dailyQuote.getContents().getSingleQuote();
         this.copyright = dailyQuote.getContents().getCopyright();
