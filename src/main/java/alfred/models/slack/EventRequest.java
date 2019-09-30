@@ -5,6 +5,15 @@ public class EventRequest {
     private String challenge;
     private String type;
 
+    public EventRequest() {
+
+    }
+
+    public EventRequest(String token, String challenge, String type) {
+        this.token = token;
+        this.challenge = challenge;
+        this.type = type;
+    }
 
     public String getType() {
         return type;
