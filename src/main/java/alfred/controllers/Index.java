@@ -19,7 +19,7 @@ public class Index {
     }
 
     @GetMapping(value = "/")
-    public ResponseEntity<String> indexGET(@RequestParam(value = "id", defaultValue = "1337") int id) {
+    public ResponseEntity<String> indexGET() {
         logger.log(Level.INFO, "GET request on /");
 
         HttpHeaders headers = new HttpHeaders();
