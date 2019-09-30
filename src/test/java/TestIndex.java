@@ -1,53 +1,34 @@
-import com.mashape.unirest.http.exceptions.UnirestException;
-import org.junit.Before;
-import org.testng.annotations.Test;
+import alfred.Main;
+import alfred.controllers.Index;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(Index.class)
+@ContextConfiguration(classes = {Main.class})
 public class TestIndex {
 
-    @Before
-    public void setUp() throws Exception {
+    @Autowired
+    private MockMvc mockMvc;
 
-    }
-
-    // I'm still figuring out how to write test for this the correct way.
     @Test
-    public void TestDoGet() throws ServletException, IOException, UnirestException {
-
-        /* TODO : The test passes this way and gives 100% test coverage, and the server doesn't need to run, but it's hardcoded
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-
-        when(response.getWriter()).thenReturn(pw);
-        when(response.getStatus()).thenReturn(202);
-
-        Index index = new Index();
-        index.doGet(request, response);
-
-        assertEquals(202, response.getStatus());
-         */
-
-        // TODO : get the URLr dynamically
-        // TODO : this method actually tests the function, but gives 0% test coverage and the server has to run
-        // TODO : This requires the server to run, but it can't run without the tests pass...
-        /*
-        HttpResponse<String> response = Unirest.get("http://23.97.209.118/").asString();
-
-        // Check that response is not null
-        assertTrue("Index: Failed getting response", (response != null));
-
-        // Check status code
-        assertEquals("Index: failed asserting status codes are equal",
-                HttpServletResponse.SC_ACCEPTED, response.getStatus());
-
-        // Check content-type
-        assertTrue("Index: Failed asserting correct content-type",
-                (response.getHeaders().get("Content-Type").toString().contains("text/html")));
-         */
+    public void getIndex() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get("/")
+                        .accept(MediaType.TEXT_HTML))
+                // .andDo(print()) // Uncomment for debugging
+                .andExpect(status().isAccepted());
     }
+
 }
