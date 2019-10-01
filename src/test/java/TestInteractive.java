@@ -10,6 +10,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,18 +26,41 @@ public class TestInteractive {
     private MockMvc mockMvc;
 
     @Test
-    public void testPOSTInteractive() throws Exception {
+    public void testPOSTInteractive_ReturnExpiredURL() throws Exception {
         String xSlackSignature = "TEST-xSlackSignature";
 
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/interactive")                             // Post to correct page
-                        // TODO : add test data and read from file or make this prettier/more compact
-                        .content("")
+                        .post("/interactive")                        // Post to correct page
+                        .content(getInteractiveTXT())                           // Get body from file
                         .header("X-SLack-Signature", xSlackSignature)    // Add correct header
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)                // Establish content type
-                        .accept(MediaType.TEXT_PLAIN))                          // Expect body in plain text
-                .andDo(print())                                               // Uncomment for debugging
-                .andExpect(status().isOk());
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))    // Establish content type
+                .andDo(print())                                                // Uncomment for debugging
+                .andExpect(status().isInternalServerError());                  // Expect error: expired_url
+    }
+
+    private String getInteractiveTXT() throws IOException {
+
+        // Get file path
+        Path filePath = Paths.get("interactive.txt");
+
+        // Get file
+        File file = new File(filePath.toString());
+
+        // Check if file exists
+        if (!file.exists()) {
+            throw new FileNotFoundException();
+        }
+
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        StringBuilder builder = new StringBuilder();
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            builder.append(line);
+        }
+
+        return builder.toString();
     }
 }

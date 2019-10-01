@@ -104,7 +104,6 @@ public class Interactive {
     }
 
     private Repository getRepository(String URL) {
-        System.out.println(URL);
         HttpResponse<JsonNode> response = null;
         try {
 
