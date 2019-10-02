@@ -14,7 +14,6 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -29,13 +28,15 @@ public class TestInteractive {
     public void testPOSTInteractive_ReturnExpiredURL() throws Exception {
         String xSlackSignature = "TEST-xSlackSignature";
 
+        String body = getInteractiveTXT();
+
         mockMvc.perform(
                 MockMvcRequestBuilders
                         .post("/interactive")                        // Post to correct page
-                        .content(getInteractiveTXT())                           // Get body from file
+                        .content(body)                                          // Get body from file
                         .header("X-SLack-Signature", xSlackSignature)    // Add correct header
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED))    // Establish content type
-                .andDo(print())                                                // Uncomment for debugging
+                //.andDo(print())                                                // Uncomment for debugging
                 .andExpect(status().isInternalServerError());                  // Expect error: expired_url
     }
 
