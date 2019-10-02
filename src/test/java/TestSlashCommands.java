@@ -37,6 +37,7 @@ public class TestSlashCommands {
 
     }
 
+    @Ignore
     @Test
     public void TestPOSTMannen() throws Exception {
 
