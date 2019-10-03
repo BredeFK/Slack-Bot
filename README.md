@@ -50,8 +50,13 @@ See [Templates](Templates.md) for better understanding of all `toJson()` functio
 
 ## Deployment (Still in progress!) 
 1. Clone this repository `git clone https://gitlab.com/BredeFK/alfred.git`
-2. Open `Dockerfile` and add the two environment variables `SLACK-BOT-TOKEN` and `CHANNEL-ID-GENERAL`
-3. Run `make build`
+1. Open `Dockerfile` and add the two environment variables `SLACK-BOT-TOKEN` and `CHANNEL-ID-GENERAL`
+1. Run `make build`
+
+## SonarQube
+1. [Download and start SonarQube server](https://docs.sonarqube.org/latest/setup/get-started-2-minutes/)
+1. run `mvn clean verify sonar:sonar`
+1. or run `mvn sonar:sonar` if project is unchanged
 
 ### Makefile
 * make build
