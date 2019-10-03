@@ -40,7 +40,6 @@ public class Interactive {
         // Source: https://stackoverflow.com/a/16453677/8883030
         // Decode x-www-form-urlencoded and remove 'payload=' at the beginning (Convert to json string)
         try {
-            // payload = URLDecoder.decode(body, StandardCharsets.UTF_8).replace("payload=", "");
             String payload = new URI(request.getBody()).getPath().replace("payload=", "");
 
             // Convert json string to object of InteractiveResponse

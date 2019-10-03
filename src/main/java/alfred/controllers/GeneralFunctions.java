@@ -18,7 +18,6 @@ public class GeneralFunctions {
         SlackResponse slackResponse = new SlackResponse();
         HttpResponse<JsonNode> response = null;
         Gson g = new GsonBuilder().create();
-        SlackResponse msgResponse;
 
         // Try to post request to send message
         try {

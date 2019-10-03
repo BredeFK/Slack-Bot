@@ -16,6 +16,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -37,6 +38,8 @@ public class SlashCommands {
     private static final Logger logger = Logger.getLogger(SlashCommands.class.getName());
 
     private static final String SLACK_MSG_URL = "https://slack.com/api/chat.postMessage";
+
+    private static final String ACCEPT = "accept";
 
     @Autowired // Service for DB
     private DailyQuoteService dailyQuoteService;
@@ -65,11 +68,11 @@ public class SlashCommands {
                 case "/github":
                     return sendGithubUser(text, envVars);
                 case "/mannen":
-                    return mannenFallen(envVars);
+                    return mountainFallen(envVars, "https://www.harmannenfalt.no/api", "Mannen");
                 case "/dovre":
-                    return dovreFallen(envVars);
+                    return mountainFallen(envVars, "https://www.hardovrefalt.no/api", "Dovre");
                 default:
-                    logger.log(Level.WARNING, "The command '" + command + "' is not valid");
+                    logger.log(Level.WARNING, "The command \"{0}\" is not valid", command);
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         }
@@ -77,56 +80,30 @@ public class SlashCommands {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    private ResponseEntity<String> mannenFallen(EnvVars envVars) {
-        Mountain mannen = getMountainStatus("https://www.harmannenfalt.no/api");
 
-        if (mannen != null) {
-            mannen.setChannelID(envVars.getChannelGeneral());
+    private ResponseEntity<String> mountainFallen(EnvVars envVars, String url, String name) {
+        Mountain mountain = getMountainStatus(url);
 
-            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getTOKEN(), mannen.toJson("Mannen"));
+        if (mountain != null) {
+            mountain.setChannelID(envVars.getChannelGeneral());
+
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getTOKEN(), mountain.toJson(name));
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
-                logger.log(Level.WARNING, "MannenFallen Error: " + msgResponse.getError());
+                logger.log(Level.WARNING, "Mountain Error: {0}", msgResponse.getError());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                logger.log(Level.WARNING, "MannenFallen Warning : " + msgResponse.getWarning());
+                logger.log(Level.WARNING, "Mountain Warning: {0}", msgResponse.getWarning());
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            logger.log(Level.WARNING, "something went wrong with getting mannen");
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private ResponseEntity<String> dovreFallen(EnvVars envVars) {
-        Mountain dovre = getMountainStatus("https://www.hardovrefalt.no/api");
-
-        if (dovre != null) {
-            dovre.setChannelID(envVars.getChannelGeneral());
-
-            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getTOKEN(), dovre.toJson("Dovre"));
-
-            // Check for errors and log them
-            if (!msgResponse.isOk()) {
-                logger.log(Level.WARNING, "DovreFallen Error: " + msgResponse.getError());
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-
-            // Check for warnings and log them
-            if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                logger.log(Level.WARNING, "DovreFallen Warning : " + msgResponse.getWarning());
-                return new ResponseEntity<>(HttpStatus.ACCEPTED);
-            }
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            logger.log(Level.WARNING, "something went wrong with getting dovre");
+            logger.log(Level.WARNING, "Something went wrong with getting {0}", name);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -137,10 +114,10 @@ public class SlashCommands {
 
             // Get the quote in json format
             response = Unirest.get(URL)
-                    .header("accept", "application/json")
+                    .header(ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .asJson();
         } catch (UnirestException e) {
-            logger.log(Level.WARNING, "getMountainStatus Error : " + e.getMessage());
+            logger.log(Level.WARNING, "getMountainStatus Error : {0}", e.getMessage());
             return new Mountain();
         }
 
@@ -159,7 +136,7 @@ public class SlashCommands {
         } catch (Exception e) {
 
             // Log error and return correct response
-            logger.log(Level.WARNING, "GetQuoteOfTheDay Error: " + e.getMessage());
+            logger.log(Level.WARNING, "GetQuoteOfTheDay Error: {0}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -174,13 +151,13 @@ public class SlashCommands {
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
-                logger.log(Level.WARNING, "Error: " + msgResponse.getError());
+                logger.log(Level.WARNING, "Error: {0}", msgResponse.getError());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                logger.log(Level.WARNING, "Warning : " + msgResponse.getWarning());
+                logger.log(Level.WARNING, "Warning : {0}", msgResponse.getWarning());
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
@@ -189,8 +166,7 @@ public class SlashCommands {
         } else {
 
             // Log error and return status code 500
-            logger.log(Level.WARNING, "Error " + quote.getError().toString());
-            //resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            logger.log(Level.WARNING, "Error: {0}", quote.getError());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -212,13 +188,13 @@ public class SlashCommands {
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
-                logger.log(Level.WARNING, "alfred.Classes.SlackResponse Error: " + msgResponse.getError());
+                logger.log(Level.WARNING, "alfred.Classes.SlackResponse Error: {0}", msgResponse.getError());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                logger.log(Level.WARNING, "alfred.Classes.SlackResponse Warning : " + msgResponse.getWarning());
+                logger.log(Level.WARNING, "alfred.Classes.SlackResponse Warning : {0}", msgResponse.getWarning());
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
@@ -226,7 +202,7 @@ public class SlashCommands {
         } else {
 
             // Log error and return status code 404
-            logger.log(Level.WARNING, "Error " + githubUser.getMessage());
+            logger.log(Level.WARNING, "Error: {0}", githubUser.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -238,10 +214,10 @@ public class SlashCommands {
         try {
             // Get the github profile in json format
             response = Unirest.get("https://api.github.com/users/" + username)
-                    .header("accept", "application/json")
+                    .header(ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .asJson();
         } catch (UnirestException e) {
-            logger.log(Level.WARNING, "alfred.Classes.GithubUser Error : " + e.getMessage());
+            logger.log(Level.WARNING, "GithubUser Error : {0}", e.getMessage());
             return new GithubUser();
         }
 
@@ -255,10 +231,10 @@ public class SlashCommands {
             try {
                 // Get the repositories in json format
                 response = Unirest.get(user.getRepos_url())
-                        .header("accept", "application/json")
+                        .header(ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                         .asJson();
             } catch (UnirestException e) {
-                logger.log(Level.WARNING, "alfred.Classes.GithubUser alfred.Classes.Repository Error : " + e.getMessage());
+                logger.log(Level.WARNING, "GithubUser Repository Error : {0}", e.getMessage());
                 return new GithubUser();
             }
 
@@ -299,7 +275,7 @@ public class SlashCommands {
 
         // Get the quote in json format
         HttpResponse<JsonNode> response = Unirest.get("https://quotes.rest/qod")
-                .header("accept", "application/json")
+                .header(ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .asJson();
 
         // Convert response to DailyQuote Object
@@ -309,9 +285,7 @@ public class SlashCommands {
         long id = dailyQuoteService.add(dailyQuote);
 
         // Log events
-        logger.log(Level.INFO, String.format("New DailyQuote is added to DB with ID %d", id));
-        logger.log(Level.INFO, "Using quote of the day from external API");
-
+        logger.log(Level.INFO, "New DailyQuote is added to DB with ID {0}%nUsing quote of the day from external API", id);
         return dailyQuote;
     }
 }
