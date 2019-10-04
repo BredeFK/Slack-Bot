@@ -127,7 +127,7 @@ public class SlashCommands {
     }
 
     // sendQuote Sends the daily quote to the channel
-    private ResponseEntity<String> sendQuote(EnvVars envVars) {
+    public ResponseEntity<String> sendQuote(EnvVars envVars) {
 
         // Try to get the quote of the day
         DailyQuote quote = null;
@@ -151,13 +151,13 @@ public class SlashCommands {
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
-                logger.log(Level.WARNING, "Error: {0}", msgResponse.getError());
+                logger.log(Level.WARNING, "SlackResponse Error: {0}", msgResponse.getError());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                logger.log(Level.WARNING, "Warning : {0}", msgResponse.getWarning());
+                logger.log(Level.WARNING, "SlackResponse Warning : {0}", msgResponse.getWarning());
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
@@ -166,7 +166,7 @@ public class SlashCommands {
         } else {
 
             // Log error and return status code 500
-            logger.log(Level.WARNING, "Error: {0}", quote.getError());
+            logger.log(Level.WARNING, "Quote Error: {0}", quote.getError());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -202,7 +202,7 @@ public class SlashCommands {
         } else {
 
             // Log error and return status code 404
-            logger.log(Level.WARNING, "Error: {0}", githubUser.getMessage());
+            logger.log(Level.WARNING, "GitHubUser Error: {0}", githubUser.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -250,7 +250,7 @@ public class SlashCommands {
     }
 
     // getQuoteOfTheDay returns the quote of the day in an object
-    private DailyQuote getQuoteOfTheDay() throws Exception {
+    public DailyQuote getQuoteOfTheDay() throws Exception {
 
         List<DailyQuote> dailyQuotes = dailyQuoteService.list();
 
