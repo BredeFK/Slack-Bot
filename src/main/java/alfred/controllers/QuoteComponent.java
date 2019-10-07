@@ -35,6 +35,6 @@ public class QuoteComponent {
         if (responseEntity.getStatusCode() == HttpStatus.OK)
             logger.log(Level.INFO, "Automatically sent quote at: {0}", dateFormat.format(new Date()));
         else
-            logger.log(Level.WARNING, "Something went wrong with automatically sending the quot. Error : {0}", responseEntity.getStatusCodeValue());
+            logger.log(Level.WARNING, "Something went wrong with automatically sending the quote. Error : {0}", responseEntity.getStatusCodeValue());
     }
 }
