@@ -37,11 +37,13 @@ public class SlashCommands {
     // Get logger
     private static final Logger logger = Logger.getLogger(SlashCommands.class.getName());
 
+    // API urls
     private static final String SLACK_MSG_URL = "https://slack.com/api/chat.postMessage";
     private static final String MANNEN_URL = "https://www.harmannenfalt.no/api";
     private static final String DOVRE_URL = "https://www.hardovrefalt.no/api";
     private static final String GITHUB_USER_URL = "https://api.github.com/users/";
     private static final String QUOTE_URL = "https://quotes.rest/qod";
+
     private static final String ACCEPT = "accept";
 
     @Autowired // Service for DB
@@ -67,7 +69,7 @@ public class SlashCommands {
         if (channelID.equals(envVars.getChannelGeneral())) {
             switch (command) {
                 case "/quote":
-                    return sendQuote(envVars);
+                    return sendQuote(envVars, dailyQuoteService);
                 case "/github":
                     return sendGithubUser(text, envVars);
                 case "/mannen":
@@ -130,12 +132,12 @@ public class SlashCommands {
     }
 
     // sendQuote Sends the daily quote to the channel
-    public ResponseEntity<String> sendQuote(EnvVars envVars) {
+    public ResponseEntity<String> sendQuote(EnvVars envVars, DailyQuoteService dailyQuoteService) {
 
         // Try to get the quote of the day
         DailyQuote quote = null;
         try {
-            quote = getQuoteOfTheDay();
+            quote = getQuoteOfTheDay(dailyQuoteService);
         } catch (Exception e) {
 
             // Log error and return correct response
@@ -253,7 +255,7 @@ public class SlashCommands {
     }
 
     // getQuoteOfTheDay returns the quote of the day in an object
-    public DailyQuote getQuoteOfTheDay() throws Exception {
+    public DailyQuote getQuoteOfTheDay(DailyQuoteService dailyQuoteService) throws Exception {
 
         List<DailyQuote> dailyQuotes = dailyQuoteService.list();
 
@@ -288,7 +290,7 @@ public class SlashCommands {
         long id = dailyQuoteService.add(dailyQuote);
 
         // Log events
-        logger.log(Level.INFO, "New DailyQuote is added to DB with ID {0}%nUsing quote of the day from external API", id);
+        logger.log(Level.INFO, "New DailyQuote is added to DB with ID {0} | Using quote of the day from external API", id);
         return dailyQuote;
     }
 }
