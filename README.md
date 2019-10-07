@@ -6,6 +6,8 @@ where the user can get a daily quote or checkup a GitHub user and then check her
 This project uses api's from _https://quotes.rest/_ for quotes and _https://api.github.com/_ for getting github users and repositories.
 
 ## Functionality
+* Daily quote will be sent every day at 09:15
+
 * `/quote` returns a daily quote
 
 ![](https://i.imgur.com/J8nQb1K.png)
