@@ -32,7 +32,8 @@ public class QuoteComponent {
     private DailyQuoteService dailyQuoteService;
 
 
-    @Scheduled(fixedRate = day)
+    // This will send the quote everyday at  09:15 in the morning
+    @Scheduled(cron = "0 15 9 * * ?") // (cron = "[Seconds] [Minutes] [Hours] [Day of month] [Month] [Day of week]")
     public void sendQuote() {
 
         // Get and send quote
