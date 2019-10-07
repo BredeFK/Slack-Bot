@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// alfred.Handlers.SlashCommands handles commands from slack-users (https://api.slack.com/slash-commands)
+// SlashCommands handles commands from slack-users (https://api.slack.com/slash-commands)
 
 @RestController
 public class SlashCommands {
@@ -38,7 +38,10 @@ public class SlashCommands {
     private static final Logger logger = Logger.getLogger(SlashCommands.class.getName());
 
     private static final String SLACK_MSG_URL = "https://slack.com/api/chat.postMessage";
-
+    private static final String MANNEN_URL = "https://www.harmannenfalt.no/api";
+    private static final String DOVRE_URL = "https://www.hardovrefalt.no/api";
+    private static final String GITHUB_USER_URL = "https://api.github.com/users/";
+    private static final String QUOTE_URL = "https://quotes.rest/qod";
     private static final String ACCEPT = "accept";
 
     @Autowired // Service for DB
@@ -68,9 +71,9 @@ public class SlashCommands {
                 case "/github":
                     return sendGithubUser(text, envVars);
                 case "/mannen":
-                    return mountainFallen(envVars, "https://www.harmannenfalt.no/api", "Mannen");
+                    return mountainFallen(envVars, MANNEN_URL, "Mannen");
                 case "/dovre":
-                    return mountainFallen(envVars, "https://www.hardovrefalt.no/api", "Dovre");
+                    return mountainFallen(envVars, DOVRE_URL, "Dovre");
                 default:
                     logger.log(Level.WARNING, "The command \"{0}\" is not valid", command);
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -188,13 +191,13 @@ public class SlashCommands {
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
-                logger.log(Level.WARNING, "alfred.Classes.SlackResponse Error: {0}", msgResponse.getError());
+                logger.log(Level.WARNING, "SlackResponse Error: {0}", msgResponse.getError());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             // Check for warnings and log them
             if (msgResponse.getWarning() != null && !msgResponse.getWarning().isEmpty()) {
-                logger.log(Level.WARNING, "alfred.Classes.SlackResponse Warning : {0}", msgResponse.getWarning());
+                logger.log(Level.WARNING, "SlackResponse Warning : {0}", msgResponse.getWarning());
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
@@ -213,7 +216,7 @@ public class SlashCommands {
 
         try {
             // Get the github profile in json format
-            response = Unirest.get("https://api.github.com/users/" + username)
+            response = Unirest.get(GITHUB_USER_URL + username)
                     .header(ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .asJson();
         } catch (UnirestException e) {
@@ -274,7 +277,7 @@ public class SlashCommands {
         // If the quote wasn't in db, then try to get the quote from external API
 
         // Get the quote in json format
-        HttpResponse<JsonNode> response = Unirest.get("https://quotes.rest/qod")
+        HttpResponse<JsonNode> response = Unirest.get(QUOTE_URL)
                 .header(ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .asJson();
 
