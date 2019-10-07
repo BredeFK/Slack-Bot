@@ -3,7 +3,8 @@
 This bot is only written in Java (with Docker and MakeFile to deploy) and is a bot in slack
 where the user can get a daily quote or checkup a GitHub user and then check her/his repositories one at the time.
 
-This project uses api's from _https://quotes.rest/_ for quotes and _https://api.github.com/_ for getting github users and repositories.
+This project uses api's from _https://quotes.rest/qod_ for quotes, _https://api.github.com/users/_ for getting github users and repositories, 
+_https://www.harmannenfalt.no/api_ and _https://www.hardovrefalt.no/api_ for getting info about the mountains Mannen and Dovre have fallen or not.
 
 ## Functionality
 * Daily quote will be sent every day at 09:15
@@ -50,7 +51,7 @@ See [Templates](Templates.md) for better understanding of all `toJson()` functio
 * make
 * git
 
-## Deployment (Still in progress!) 
+## Deployment
 1. Clone this repository `git clone https://gitlab.com/BredeFK/alfred.git`
 1. Open `Dockerfile` and add the two environment variables `SLACK-BOT-TOKEN` and `CHANNEL-ID-GENERAL`
 1. Run `make build`
