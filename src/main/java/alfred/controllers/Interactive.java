@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 public class Interactive {
     private static final Logger logger = Logger.getLogger(Interactive.class.getName());
 
-    @PostMapping(value = "/interactive", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/api/slack/interactive", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public @ResponseBody
     ResponseEntity<String> interactivePOST(HttpEntity<String> request) {
         logger.log(Level.INFO, "POST request to /interactive");

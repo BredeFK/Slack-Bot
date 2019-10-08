@@ -22,9 +22,6 @@ public class QuoteComponent {
     // Date format
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss Z");
 
-    // 60 sec, 60min, 24h, to milliseconds
-    private static final int day = 60 * 60 * 24 * 1000;
-
     // Environmental variables
     private EnvVars envVars = new EnvVars();
 

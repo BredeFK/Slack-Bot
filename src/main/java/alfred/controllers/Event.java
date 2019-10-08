@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class Event {
     private static final Logger logger = Logger.getLogger(Event.class.getName());
 
-    @PostMapping(value = "/event")
+    @PostMapping(value = "/api/slack/event")
     public ResponseEntity<String> eventPOST(@RequestHeader("X-Slack-Signature") String header, @RequestBody EventRequest request) {
         logger.log(Level.INFO, "POST request on /event");
 

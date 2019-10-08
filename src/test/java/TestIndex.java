@@ -25,7 +25,7 @@ public class TestIndex {
     public void getIndex() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/")
+                        .get("/api/slack/")
                         .accept(MediaType.TEXT_HTML))
                 // .andDo(print()) // Uncomment for debugging
                 .andExpect(status().isAccepted());

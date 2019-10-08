@@ -38,7 +38,7 @@ public class TestSlashCommands {
 /*
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/slashcommands")                             // Post to correct page
+                        .post("/api/slack/slashcommands")                             // Post to correct page
                         .header("X-SLack-Signature", xSlackSignature)    // Add correct header
                         .param("channel_id", "")
                         .param("command", "/mannen")

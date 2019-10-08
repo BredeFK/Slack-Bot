@@ -33,7 +33,7 @@ public class TestEvent {
 
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/event")                             // Post to correct page
+                        .post("/api/slack/event")                             // Post to correct page
                         .content(g.toJson(request))                             // Pass correct request body as json
                         .header("X-SLack-Signature", xSlackSignature)    // Add correct header
                         .contentType(MediaType.APPLICATION_JSON)                // Establish content type

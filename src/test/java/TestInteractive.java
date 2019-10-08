@@ -32,7 +32,7 @@ public class TestInteractive {
 
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/interactive")                        // Post to correct page
+                        .post("/api/slack/interactive")                        // Post to correct page
                         .content(body)                                          // Get body from file
                         .header("X-SLack-Signature", xSlackSignature)    // Add correct header
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED))    // Establish content type

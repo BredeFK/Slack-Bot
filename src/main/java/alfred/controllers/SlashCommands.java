@@ -49,7 +49,7 @@ public class SlashCommands {
     @Autowired // Service for DB
     private DailyQuoteService dailyQuoteService;
 
-    @PostMapping(value = "/slashcommands")
+    @PostMapping(value = "/api/slack/slashcommands")
     public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,
                                                     @RequestParam("channel_id") String channelID,
                                                     @RequestParam("command") String command,

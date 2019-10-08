@@ -17,7 +17,7 @@ public class Index {
 
     }
 
-    @GetMapping(value = "/")
+    @GetMapping(value = "/api/slack/")
     public ResponseEntity<String> indexGET() {
         logger.log(Level.INFO, "GET request on /");
 
@@ -25,6 +25,6 @@ public class Index {
         headers.add("content-type", "text/html;charset=UTF-8");
 
         return new ResponseEntity<>(
-                "<h1>Welcome to my index page</h1><h2>This is all</h2>", headers, HttpStatus.ACCEPTED);
+                "<h1>Welcome to my index page for api/slack/</h1><h2>This is all</h2>", headers, HttpStatus.ACCEPTED);
     }
 }
