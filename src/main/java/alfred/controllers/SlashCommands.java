@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,9 +54,10 @@ public class SlashCommands {
     public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,
                                                     @RequestParam("channel_id") String channelID,
                                                     @RequestParam("command") String command,
-                                                    @RequestParam("text") String text) {
+                                                    @RequestParam("text") String text,
+                                                    HttpServletRequest httpServletRequest) {
 
-        logger.log(Level.INFO, "POST request on /slashcommands");
+        logger.log(Level.INFO, "POST request on {0}", httpServletRequest.getRequestURL());
 
         // Get environment variables
         EnvVars envVars = new EnvVars();

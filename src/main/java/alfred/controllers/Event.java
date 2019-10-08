@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,8 +19,8 @@ public class Event {
     private static final Logger logger = Logger.getLogger(Event.class.getName());
 
     @PostMapping(value = "/api/slack/event")
-    public ResponseEntity<String> eventPOST(@RequestHeader("X-Slack-Signature") String header, @RequestBody EventRequest request) {
-        logger.log(Level.INFO, "POST request on /event");
+    public ResponseEntity<String> eventPOST(@RequestHeader("X-Slack-Signature") String header, @RequestBody EventRequest request, HttpServletRequest httpServletRequest) {
+        logger.log(Level.INFO, "POST request on {0}", httpServletRequest.getRequestURL());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("content-type", "text/plain;charset=UTF-8");

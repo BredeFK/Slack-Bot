@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,8 +19,8 @@ public class Index {
     }
 
     @GetMapping(value = "/api/slack/")
-    public ResponseEntity<String> indexGET() {
-        logger.log(Level.INFO, "GET request on /");
+    public ResponseEntity<String> indexGET(HttpServletRequest httpServletRequest) {
+        logger.log(Level.INFO, "GET request on {0}", httpServletRequest.getRequestURL());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("content-type", "text/html;charset=UTF-8");
