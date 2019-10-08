@@ -51,6 +51,12 @@ See [Templates](Templates.md) for better understanding of all `toJson()` functio
 * make
 * git
 
+## Requirements
+* Open port `8080`
+* make `sudo apt install make`
+* mvn `sudo apt install maven`
+* docker `sudo apt install docker.io -y`
+
 ## Deployment
 1. Clone this repository `git clone https://gitlab.com/BredeFK/alfred.git`
 1. Open `Dockerfile` and add the two environment variables `SLACK-BOT-TOKEN` and `CHANNEL-ID-GENERAL`
