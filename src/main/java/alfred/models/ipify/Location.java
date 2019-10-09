@@ -1,27 +1,21 @@
 package alfred.models.ipify;
 
 public class Location {
-    private String ip;
     private String country;
     private String region;
     private String city;
     private String timezone;
 
-    public Location(String ip) {
-        this.ip = ip;
+    public Location() {
+
 
     }
 
-    public Location(String ip, String country, String region, String city, String timezone) {
-        this.ip = ip;
+    public Location(String country, String region, String city, String timezone) {
         this.country = country;
         this.region = region;
         this.city = city;
         this.timezone = timezone;
-    }
-
-    public String getIp() {
-        return ip;
     }
 
     public String getCountry() {

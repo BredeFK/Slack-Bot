@@ -1,6 +1,7 @@
 package alfred.controllers;
 
 import alfred.models.general.EnvVars;
+import alfred.models.ipify.IPinfo;
 import alfred.models.ipify.Location;
 import com.google.gson.GsonBuilder;
 import com.mashape.unirest.http.HttpResponse;
@@ -35,24 +36,22 @@ public class ErrorHandler implements ErrorController {
         HttpStatus status = HttpStatus.valueOf(statusCode);
 
         // Get users IP address
-        String IP = httpServletRequest.getRemoteAddr();
-
+        String ip = httpServletRequest.getRemoteAddr();
+        
         // Init location
-        Location location = null;
+        IPinfo iPinfo;
 
         // Get location info if possible
-        if (IP.equals("0:0:0:0:0:0:0:1") || envVars.getIpifyToken().isEmpty()) {
-            location = new Location(IP, "testcountry", "testRegion", "testCity", "+00:00");
+        if (ip.equals("0:0:0:0:0:0:0:1") || envVars.getIpifyToken().isEmpty()) {
+            iPinfo = new IPinfo(ip, "testcountry", "testRegion", "testCity", "+00:00");
         } else {
-            location = getInfoFromIP(IP);
-
-            if (location == null) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            iPinfo = getInfoFromIP(ip);
         }
 
+        Location location = iPinfo.getLocation();
+
         // Create detailed error message
-        String logMessage = String.format("Error: %d - %s | %s: %s, %s (%s)", statusCode, status.getReasonPhrase(), location.getCountry(), location.getRegion(), location.getCity(), IP);
+        String logMessage = String.format("Error: %d - %s | %s: %s, %s (%s)", statusCode, status.getReasonPhrase(), location.getCountry(), location.getRegion(), location.getCity(), ip);
 
         // Log event
         logger.log(Level.WARNING, logMessage);
@@ -75,26 +74,19 @@ public class ErrorHandler implements ErrorController {
         );
     }
 
-    // Returns locations from Ip address
-    private Location getInfoFromIP(String IP) {
+    // Returns information about ip address from Ip address
+    private IPinfo getInfoFromIP(String IP) throws UnirestException {
         String url = String.format("https://geo.ipify.org/api/v1?apiKey=%s&ipAddress=%s", envVars.getIpifyToken(), IP);
-        System.out.println(url);
         HttpResponse<JsonNode> response = null;
 
 
         // Get info about ip in json format
-        try {
-            response = Unirest.get(url)
-                    .header("accept", "application/json")
-                    .asJson();
-        } catch (UnirestException e) {
-            logger.log(Level.WARNING, "Exception thrown: " + e.getMessage());
-            return null;
-        }
-
+        response = Unirest.get(url)
+                .header("accept", "application/json")
+                .asJson();
 
         // Convert from json to class
-        return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), Location.class);
+        return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), IPinfo.class);
     }
 
     @Override
