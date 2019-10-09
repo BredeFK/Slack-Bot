@@ -87,7 +87,7 @@ public class Interactive {
         repo.setChannelID(envVars.getChannelGeneral());
 
         // Try to post message to slack user
-        SlackResponse slackResponse = new GeneralFunctions().postSlackMessage(interactiveResponse.getResponse_url(), envVars.getTOKEN(), repo.toJson());
+        SlackResponse slackResponse = new GeneralFunctions().postSlackMessage(interactiveResponse.getResponse_url(), envVars.getToken(), repo.toJson());
 
         // Check for errors and log them
         if (!slackResponse.isOk()) {

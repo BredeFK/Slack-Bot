@@ -17,6 +17,9 @@ COPY files files
 #Environment variables
 ENV SLACK-BOT-TOKEN=""
 ENV CHANNEL-ID-GENERAL=""
+ENV WEBSITE-NAME=""
+ENV WEBSITE-URL=""
+ENV CONTACT_EMAIL=""
 
 # Run the .jar file fancy
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
