@@ -59,7 +59,7 @@ See [Templates](Templates.md) for better understanding of all `toJson()` functio
 
 ## Deployment
 1. Clone this repository `git clone https://gitlab.com/BredeFK/alfred.git`
-1. Open `Dockerfile` and add the two environment variables `SLACK-BOT-TOKEN` and `CHANNEL-ID-GENERAL`
+1. Open `Dockerfile` and add all environment variables
 1. Run `make build`
 
 ## SonarQube
@@ -76,4 +76,9 @@ See [Templates](Templates.md) for better understanding of all `toJson()` functio
 ## Managing deployment
 * To check logs on running deployment `screen -r`
 * To check status and ID on running container `docker container ls`
-* To stop deployment `docker container stop <CONTAINER ID>` 
+* To stop deployment `docker container stop <CONTAINER ID>` or `screen -r` and `ctrl + c`
+
+## Bonus
+* This project has a nice front-end for error page.
+* It has an Privacy Policy.
+* It will soon track ip address and give location in logs, but not store them!
