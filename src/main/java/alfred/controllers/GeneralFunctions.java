@@ -8,6 +8,10 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class GeneralFunctions {
 
     public GeneralFunctions() {
@@ -39,5 +43,30 @@ public class GeneralFunctions {
         slackResponse = g.fromJson(String.valueOf(response.getBody()), SlackResponse.class);
 
         return slackResponse;
+    }
+
+    public String getFileAsString(String fileName) throws IOException {
+
+        // Get file path
+        Path filePath = Paths.get(fileName);
+
+        // Get file
+        File file = new File(filePath.toString());
+
+        // Check if file exists
+        if (!file.exists()) {
+            throw new FileNotFoundException();
+        }
+
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        StringBuilder builder = new StringBuilder();
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            builder.append(line);
+        }
+
+        return builder.toString();
     }
 }
