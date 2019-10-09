@@ -94,7 +94,7 @@ public class SlashCommands {
         if (mountain != null) {
             mountain.setChannelID(envVars.getChannelGeneral());
 
-            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getToken(), mountain.toJson(name));
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getSlackToken(), mountain.toJson(name));
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
@@ -154,7 +154,7 @@ public class SlashCommands {
         if (quote.getError() == null) {
 
             // Post quote to Slack
-            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getToken(), quote.toJson());
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getSlackToken(), quote.toJson());
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
@@ -191,7 +191,7 @@ public class SlashCommands {
         if (githubUser.getMessage() == null) {
 
             // Try to post message to slack
-            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getToken(), githubUser.toJson());
+            SlackResponse msgResponse = new GeneralFunctions().postSlackMessage(SLACK_MSG_URL, envVars.getSlackToken(), githubUser.toJson());
 
             // Check for errors and log them
             if (!msgResponse.isOk()) {
