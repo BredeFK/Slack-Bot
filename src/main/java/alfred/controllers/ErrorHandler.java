@@ -34,10 +34,18 @@ public class ErrorHandler implements ErrorController {
         // TODO go back to this. v
         //new GeneralFunctions().getFileAsString("error.txt");
         // Get html body
+
+        // TODO remove testing
+        System.out.println("Path: " + new File(".").getAbsolutePath());
+        System.out.println("Paths: " + Paths.get(".").toAbsolutePath().normalize().toString());
+
+
+        /*
         String error = getFileAsString("error.txt");
 
         error = error.replace("{{ status }}", Integer.toString(statusCode));
         error = error.replace("{{ error }}", status.getReasonPhrase());
+         */
 
         // Set headers
         HttpHeaders headers = new HttpHeaders();
@@ -45,7 +53,7 @@ public class ErrorHandler implements ErrorController {
 
 
         return new ResponseEntity<>(
-                error, headers, status
+                "hei", headers, status
         );
     }
 
