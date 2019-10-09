@@ -33,6 +33,7 @@ public class Interactive {
     ResponseEntity<String> interactivePOST(HttpEntity<String> request, HttpServletRequest httpServletRequest) {
         logger.log(Level.INFO, "POST request on {0}", httpServletRequest.getRequestURL());
 
+
         if (request.getBody() == null) {
             logger.log(Level.WARNING, "Interactive Error: request is null");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
