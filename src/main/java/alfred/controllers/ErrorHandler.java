@@ -45,6 +45,10 @@ public class ErrorHandler implements ErrorController {
             location = new Location(IP, "testcountry", "testRegion", "testCity", "+00:00");
         } else {
             location = getInfoFromIP(IP);
+
+            if (location == null) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
 
         // Create detailed error message
@@ -72,15 +76,21 @@ public class ErrorHandler implements ErrorController {
     }
 
     // Returns locations from Ip address
-    private Location getInfoFromIP(String IP) throws UnirestException {
+    private Location getInfoFromIP(String IP) {
         String url = String.format("https://geo.ipify.org/api/v1?apiKey=%s&ipAddress=%s", envVars.getIpifyToken(), IP);
+        System.out.println(url);
         HttpResponse<JsonNode> response = null;
 
 
         // Get info about ip in json format
-        response = Unirest.get(url)
-                .header("accept", "application/json")
-                .asJson();
+        try {
+            response = Unirest.get(url)
+                    .header("accept", "application/json")
+                    .asJson();
+        } catch (UnirestException e) {
+            logger.log(Level.WARNING, "Exception thrown: " + e.getMessage());
+            return null;
+        }
 
 
         // Convert from json to class
