@@ -30,7 +30,8 @@ public class ErrorHandler implements ErrorController {
         HttpStatus status = HttpStatus.valueOf(statusCode);
 
         // Get html body
-        String error = new GeneralFunctions().getFileAsString("error.html");
+        String error = new GeneralFunctions().getFileAsString("error.txt");
+
         error = error.replace("{{ status }}", Integer.toString(statusCode));
         error = error.replace("{{ error }}", status.getReasonPhrase());
 
