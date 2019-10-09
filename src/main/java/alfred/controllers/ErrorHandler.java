@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -30,14 +31,15 @@ public class ErrorHandler implements ErrorController {
 
     @RequestMapping(PATH)
     public ResponseEntity<String> error(HttpServletRequest httpServletRequest,
-                                        @RequestAttribute("javax.servlet.error.status_code") Integer statusCode) throws IOException, UnirestException {
+                                        @RequestAttribute(RequestDispatcher.ERROR_STATUS_CODE) Integer statusCode,
+                                        @RequestAttribute(RequestDispatcher.ERROR_REQUEST_URI) String path) throws IOException, UnirestException {
 
         // Get status code
         HttpStatus status = HttpStatus.valueOf(statusCode);
 
         // Get users IP address
         String ip = httpServletRequest.getRemoteAddr();
-        
+
         // Init location
         IPinfo iPinfo;
 
@@ -51,7 +53,7 @@ public class ErrorHandler implements ErrorController {
         Location location = iPinfo.getLocation();
 
         // Create detailed error message
-        String logMessage = String.format("Error: %d - %s | %s: %s, %s (%s)", statusCode, status.getReasonPhrase(), location.getCountry(), location.getRegion(), location.getCity(), ip);
+        String logMessage = String.format("Error: %d - %s | Url suffix: %s | %s: %s, %s (%s)", statusCode, status.getReasonPhrase(), path, location.getCountry(), location.getRegion(), location.getCity(), ip);
 
         // Log event
         logger.log(Level.WARNING, logMessage);
