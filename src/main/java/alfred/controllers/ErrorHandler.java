@@ -30,17 +30,18 @@ public class ErrorHandler implements ErrorController {
         HttpStatus status = HttpStatus.valueOf(statusCode);
 
         // Get html body
-        String error = new GeneralFunctions().getFileAsString("files/error.html");
+        String body = new GeneralFunctions().getFileAsString("files/error.html");
 
-        error = error.replace("{{ status }}", Integer.toString(statusCode));
-        error = error.replace("{{ error }}", status.getReasonPhrase());
+        body = body.replace("{{ status }}", Integer.toString(statusCode)).
+                replace("{{ error }}", status.getReasonPhrase()).
+                replace("{{ image }}", "https://picsum.photos/1920/1080");
 
         // Set headers
         HttpHeaders headers = new HttpHeaders();
         headers.add("content-type", "text/html;charset=UTF-8");
 
         return new ResponseEntity<>(
-                error, headers, status
+                body, headers, status
         );
     }
 
