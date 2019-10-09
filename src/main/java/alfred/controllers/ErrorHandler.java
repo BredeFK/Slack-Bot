@@ -24,7 +24,7 @@ public class ErrorHandler implements ErrorController {
                                         @RequestAttribute("javax.servlet.error.status_code") Integer statusCode) throws IOException {
 
         // Log event
-        logger.log(Level.WARNING, "request on {0}", httpServletRequest.getRequestURL());
+        logger.log(Level.WARNING, "Something went wrong and user got redirected to {0}", httpServletRequest.getRequestURL());
 
         // Get status code
         HttpStatus status = HttpStatus.valueOf(statusCode);
@@ -32,6 +32,7 @@ public class ErrorHandler implements ErrorController {
         // Get html body
         String body = new GeneralFunctions().getFileAsString("files/error.html");
 
+        // Fill in dynamic variables
         body = body.replace("{{ status }}", Integer.toString(statusCode)).
                 replace("{{ error }}", status.getReasonPhrase()).
                 replace("{{ image }}", "https://picsum.photos/1920/1080");

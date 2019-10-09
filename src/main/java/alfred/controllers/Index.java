@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,13 +20,16 @@ public class Index {
     }
 
     @GetMapping(value = "/api/slack/")
-    public ResponseEntity<String> indexGET(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<String> indexGET(HttpServletRequest httpServletRequest) throws IOException {
         logger.log(Level.INFO, "GET request on {0}", httpServletRequest.getRequestURL());
+
+        // Get html body
+        String body = new GeneralFunctions().getFileAsString("files/index.html");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("content-type", "text/html;charset=UTF-8");
 
         return new ResponseEntity<>(
-                "<h1>Welcome to my index page for api/slack/</h1><h2>This is all</h2>", headers, HttpStatus.ACCEPTED);
+                body, headers, HttpStatus.ACCEPTED);
     }
 }
