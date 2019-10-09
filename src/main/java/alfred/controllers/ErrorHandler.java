@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,8 +31,10 @@ public class ErrorHandler implements ErrorController {
         // Get status code
         HttpStatus status = HttpStatus.valueOf(statusCode);
 
+        // TODO go back to this. v
+        //new GeneralFunctions().getFileAsString("error.txt");
         // Get html body
-        String error = new GeneralFunctions().getFileAsString("error.txt");
+        String error = getFileAsString("error.txt");
 
         error = error.replace("{{ status }}", Integer.toString(statusCode));
         error = error.replace("{{ error }}", status.getReasonPhrase());
@@ -48,5 +52,30 @@ public class ErrorHandler implements ErrorController {
     @Override
     public String getErrorPath() {
         return PATH;
+    }
+
+    private String getFileAsString(String fileName) throws IOException {
+
+        // Get file path
+        Path filePath = Paths.get(fileName);
+
+        // Get file
+        File file = new File(filePath.toString());
+
+        // Check if file exists
+        if (!file.exists()) {
+            throw new FileNotFoundException();
+        }
+
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        StringBuilder builder = new StringBuilder();
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            builder.append(line);
+        }
+
+        return builder.toString();
     }
 }
