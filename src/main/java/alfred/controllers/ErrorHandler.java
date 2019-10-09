@@ -52,6 +52,8 @@ public class ErrorHandler implements ErrorController {
 
         Location location = iPinfo.getLocation();
 
+        // TODO get users local time and log : https://stackoverflow.com/questions/2375222/java-simpledateformat-for-time-zone-with-a-colon-separator
+
         // Create detailed error message
         String logMessage = String.format("Error: %d - %s | Url suffix: %s | %s: %s, %s (%s)", statusCode, status.getReasonPhrase(), path, location.getCountry(), location.getRegion(), location.getCity(), ip);
 
