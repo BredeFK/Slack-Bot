@@ -10,8 +10,9 @@ MAINTAINER Brede Frtijof Klausen "bfk@itverket.no"
 # Expose port 8080
 EXPOSE 8080
 
-# Copy
+# Copy jar to root
 COPY ./target/alfred-2.0.1.jar app.jar
+COPY files files
 
 #Environment variables
 ENV SLACK-BOT-TOKEN=""

@@ -25,7 +25,7 @@ public class TestInteractive {
     public void testPOSTInteractive_ReturnExpiredURL() throws Exception {
         String xSlackSignature = "TEST-xSlackSignature";
 
-        String body = new GeneralFunctions().getFileAsString("interactive.txt");
+        String body = new GeneralFunctions().getFileAsString("files/interactive.txt");
 
         mockMvc.perform(
                 MockMvcRequestBuilders
