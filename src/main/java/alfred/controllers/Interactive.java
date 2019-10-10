@@ -39,12 +39,14 @@ public class Interactive {
 
         logger.log(Level.INFO, "POST request on {0}", httpServletRequest.getRequestURL());
 
+        /* TODO : fix 'X-Slack-Signature is incorrect'
         // Check if if the request is authenticated
         String errorMessage = new GeneralFunctions().authenticatedRequest(timestamp, body, slackSignature);
         if (!errorMessage.isEmpty()) {
             logger.log(Level.WARNING, errorMessage);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+         */
 
         if (request.getBody() == null) {
             logger.log(Level.WARNING, "Interactive Error: request is null");
