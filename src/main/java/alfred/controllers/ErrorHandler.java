@@ -1,13 +1,15 @@
 package alfred.controllers;
 
 import alfred.models.general.EnvVars;
-import alfred.models.ipify.IPinfo;
+import alfred.models.ipify.IPInfo;
 import alfred.models.ipify.Location;
+import alfred.services.IPInfoService;
 import com.google.gson.GsonBuilder;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,8 @@ public class ErrorHandler implements ErrorController {
     private static final String PATH = "/error";
     private EnvVars envVars = new EnvVars();
 
+    @Autowired
+    private IPInfoService ipInfoService;
 
     @RequestMapping(PATH)
     public ResponseEntity<String> error(HttpServletRequest httpServletRequest,
@@ -42,20 +46,24 @@ public class ErrorHandler implements ErrorController {
         String ip = httpServletRequest.getRemoteAddr();
 
         // Init location
-        IPinfo iPinfo;
+        IPInfo iPinfo;
 
-        // Get location info if possible
+        // Get location info if possible, below is for testing on localhost
         if (ip.equals("0:0:0:0:0:0:0:1") || envVars.getIpifyToken().isEmpty()) {
-            iPinfo = new IPinfo(ip, "TST", "Test Region", "Test City", "+00:00");
+            iPinfo = new IPInfo(ip, "TST", "Test Region", "Test City", "+00:00");
+        } else if (ipInfoService.exist(ip)) {
+            // Get information from db
+            iPinfo = ipInfoService.getByID(ip);
         } else {
+            // Ip is not from testing or in db, get ip info and add to db
+
             iPinfo = getInfoFromIP(ip);
+            ipInfoService.add(iPinfo);
         }
 
         // Get country name from code
         Location location = iPinfo.getLocation();
         Locale locale = new Locale("", location.getCountryCode());
-
-        // TODO get users local time and log : https://stackoverflow.com/questions/2375222/java-simpledateformat-for-time-zone-with-a-colon-separator
 
         // Format user's location
         String userLocation;
@@ -66,7 +74,7 @@ public class ErrorHandler implements ErrorController {
         }
 
         // Create detailed error message
-        String logMessage = String.format("Error: %d - %s | Url suffix: %s | %s (%s)", statusCode, status.getReasonPhrase(), path, userLocation, ip);
+        String logMessage = String.format("%s (%s) | Error: %d - %s | Url suffix: %s ", userLocation, ip, statusCode, status.getReasonPhrase(), path);
 
         // Log event
         logger.log(Level.WARNING, logMessage);
@@ -90,7 +98,7 @@ public class ErrorHandler implements ErrorController {
     }
 
     // Returns information about ip address from Ip address
-    private IPinfo getInfoFromIP(String IP) throws UnirestException {
+    private IPInfo getInfoFromIP(String IP) throws UnirestException {
         String url = String.format("https://geo.ipify.org/api/v1?apiKey=%s&ipAddress=%s", envVars.getIpifyToken(), IP);
         HttpResponse<JsonNode> response = null;
 
@@ -101,7 +109,7 @@ public class ErrorHandler implements ErrorController {
                 .asJson();
 
         // Convert from json to class
-        return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), IPinfo.class);
+        return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), IPInfo.class);
     }
 
     @Override
