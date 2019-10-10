@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,17 +46,27 @@ public class ErrorHandler implements ErrorController {
 
         // Get location info if possible
         if (ip.equals("0:0:0:0:0:0:0:1") || envVars.getIpifyToken().isEmpty()) {
-            iPinfo = new IPinfo(ip, "testcountry", "testRegion", "testCity", "+00:00");
+            iPinfo = new IPinfo(ip, "TST", "Test Region", "Test City", "+00:00");
         } else {
             iPinfo = getInfoFromIP(ip);
         }
 
+        // Get country name from code
         Location location = iPinfo.getLocation();
+        Locale locale = new Locale("", location.getCountryCode());
 
         // TODO get users local time and log : https://stackoverflow.com/questions/2375222/java-simpledateformat-for-time-zone-with-a-colon-separator
 
+        // Format user's location
+        String userLocation;
+        if (location.getRegion().isEmpty() && location.getCity().isEmpty()) {
+            userLocation = String.format("(%s)%s", location.getCountryCode(), locale.getDisplayCountry());
+        } else {
+            userLocation = String.format("(%s)%s: %s, %s", location.getCountryCode(), locale.getDisplayCountry(), location.getRegion(), location.getCity());
+        }
+
         // Create detailed error message
-        String logMessage = String.format("Error: %d - %s | Url suffix: %s | %s: %s, %s (%s)", statusCode, status.getReasonPhrase(), path, location.getCountry(), location.getRegion(), location.getCity(), ip);
+        String logMessage = String.format("Error: %d - %s | Url suffix: %s | %s (%s)", statusCode, status.getReasonPhrase(), path, userLocation, ip);
 
         // Log event
         logger.log(Level.WARNING, logMessage);

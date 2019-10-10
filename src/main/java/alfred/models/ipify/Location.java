@@ -18,7 +18,7 @@ public class Location {
         this.timezone = timezone;
     }
 
-    public String getCountry() {
+    public String getCountryCode() {
         return country;
     }
 
