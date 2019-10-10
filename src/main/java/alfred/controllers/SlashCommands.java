@@ -49,7 +49,7 @@ public class SlashCommands {
 
     @PostMapping(value = "/api/slack/slashcommands")
     public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,
-                                                    @RequestHeader("X-Slack-Request-Timestamp") int timestamp,
+                                                    @RequestHeader("X-Slack-Request-Timestamp") long timestamp,
                                                     @RequestBody String body,
                                                     @RequestParam("channel_id") String channelID,
                                                     @RequestParam("command") String command,
@@ -63,7 +63,8 @@ public class SlashCommands {
 
         // TODO : remove later, for testing for now
         System.out.println(timestamp + " " + xSlackHeader + " " + body + " " + envVars.getSlackSigningSecret());
-        System.out.println(new Date(timestamp).toString());
+        System.out.println("Timestamp: " + timestamp + " | Actual timestamp: " + System.currentTimeMillis() + " | Timestamp * 1000: " + (timestamp * 1000));
+        System.out.println(new Date(timestamp * 1000).toString());
         System.out.println(new Date().toString());
 
 
