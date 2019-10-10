@@ -74,6 +74,7 @@ public class SlashCommands {
 
         // Give error if request is older than 1min (60 seconds)
         if (secondsGone > 60) {
+            logger.log(Level.WARNING, "Request is too old, it's {0} seconds old", secondsGone);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -83,14 +84,14 @@ public class SlashCommands {
         SecretKeySpec secretKeySpec = new SecretKeySpec(envVars.getSlackSigningSecret().getBytes(), "HmacSHA256");
         sha256HMAC.init(secretKeySpec);
 
-        String hash = Hex.encodeHexString(sha256HMAC.doFinal(temp.getBytes()));
+        String mySignature = "v0=" + Hex.encodeHexString(sha256HMAC.doFinal(temp.getBytes()));
 
-        System.out.println("hash: " + hash);
-        System.out.println("slack-signature: " + xSlackHeader);
+        // Give error if the signature is incorrect
+        if (!mySignature.equals(xSlackHeader)) {
+            logger.log(Level.WARNING, "X-Slack-Signature is incorrect");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
-        String mySignature = "v0=" + hash;
-
-        System.out.println("My signature: " + mySignature);
 
         // Remove all whitespace
         channelID = channelID.replaceAll("\\s+", "");
