@@ -13,13 +13,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,9 +30,21 @@ public class Interactive {
 
     @PostMapping(value = "/api/slack/interactive", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public @ResponseBody
-    ResponseEntity<String> interactivePOST(HttpEntity<String> request, HttpServletRequest httpServletRequest) {
+    ResponseEntity<String> interactivePOST(HttpEntity<String> request,
+                                           HttpServletRequest httpServletRequest,
+                                           @RequestHeader("X-Slack-Signature") String slackSignature,
+                                           @RequestHeader("X-Slack-Request-Timestamp") long timestamp,
+                                           @RequestBody String body) throws InvalidKeyException, NoSuchAlgorithmException {
+
+
         logger.log(Level.INFO, "POST request on {0}", httpServletRequest.getRequestURL());
 
+        // Check if if the request is authenticated
+        String errorMessage = new GeneralFunctions().authenticatedRequest(timestamp, body, slackSignature);
+        if (!errorMessage.isEmpty()) {
+            logger.log(Level.WARNING, errorMessage);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
         if (request.getBody() == null) {
             logger.log(Level.WARNING, "Interactive Error: request is null");

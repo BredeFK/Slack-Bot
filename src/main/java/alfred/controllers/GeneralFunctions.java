@@ -1,5 +1,6 @@
 package alfred.controllers;
 
+import alfred.models.general.EnvVars;
 import alfred.models.slack.SlackResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,15 +8,22 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.codec.binary.Hex;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 public class GeneralFunctions {
+    private EnvVars envVars;
 
     public GeneralFunctions() {
-
+        envVars = new EnvVars();
     }
 
     public SlackResponse postSlackMessage(String postURL, String token, String message) {
@@ -68,5 +76,34 @@ public class GeneralFunctions {
         }
 
         return builder.toString();
+    }
+
+    // Verify that the request is from an authenticated source (https://api.slack.com/docs/verifying-requests-from-slack)
+    public String authenticatedRequest(long timestamp, String body, String slackSignature) throws NoSuchAlgorithmException, InvalidKeyException {
+        // Get relevant dates
+        Date slackDate = new Date(timestamp * 1000);
+        Date now = new Date();
+
+        long secondsGone = (now.getTime() - slackDate.getTime()) / 1000;
+
+        // Give error if request is older than 1min (60 seconds)
+        if (secondsGone > 60) {
+            return String.format("Request is too old, it's %d seconds old", secondsGone);
+        }
+
+        String temp = String.format("v0:%d:%s", timestamp, body);
+
+        Mac sha256HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(envVars.getSlackSigningSecret().getBytes(), "HmacSHA256");
+        sha256HMAC.init(secretKeySpec);
+
+        String mySignature = "v0=" + Hex.encodeHexString(sha256HMAC.doFinal(temp.getBytes()));
+
+        // Give error if the signature is incorrect
+        if (!mySignature.equals(slackSignature)) {
+            return "X-Slack-Signature is incorrect";
+        }
+
+        return "";
     }
 }

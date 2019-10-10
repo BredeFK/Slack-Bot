@@ -14,15 +14,12 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -53,7 +50,7 @@ public class SlashCommands {
     private DailyQuoteService dailyQuoteService;
 
     @PostMapping(value = "/api/slack/slashcommands")
-    public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,
+    public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String slackSignature,
                                                     @RequestHeader("X-Slack-Request-Timestamp") long timestamp,
                                                     @RequestBody String body,
                                                     @RequestParam("channel_id") String channelID,
@@ -66,29 +63,10 @@ public class SlashCommands {
         // Get environment variables
         EnvVars envVars = new EnvVars();
 
-        // Get relevant dates
-        Date slackDate = new Date(timestamp * 1000);
-        Date now = new Date();
-
-        long secondsGone = (now.getTime() - slackDate.getTime()) / 1000;
-
-        // Give error if request is older than 1min (60 seconds)
-        if (secondsGone > 60) {
-            logger.log(Level.WARNING, "Request is too old, it's {0} seconds old", secondsGone);
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-        String temp = String.format("v0:%d:%s", timestamp, body);
-
-        Mac sha256HMAC = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secretKeySpec = new SecretKeySpec(envVars.getSlackSigningSecret().getBytes(), "HmacSHA256");
-        sha256HMAC.init(secretKeySpec);
-
-        String mySignature = "v0=" + Hex.encodeHexString(sha256HMAC.doFinal(temp.getBytes()));
-
-        // Give error if the signature is incorrect
-        if (!mySignature.equals(xSlackHeader)) {
-            logger.log(Level.WARNING, "X-Slack-Signature is incorrect");
+        // Check if if the request is authenticated
+        String errorMessage = new GeneralFunctions().authenticatedRequest(timestamp, body, slackSignature);
+        if (!errorMessage.isEmpty()) {
+            logger.log(Level.WARNING, errorMessage);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
