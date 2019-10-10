@@ -68,9 +68,9 @@ public class ErrorHandler implements ErrorController {
         // Format user's location
         String userLocation;
         if (location.getRegion().isEmpty() && location.getCity().isEmpty()) {
-            userLocation = String.format("(%s)%s", location.getCountryCode(), locale.getDisplayCountry());
+            userLocation = String.format("[%s]%s", location.getCountryCode(), locale.getDisplayCountry());
         } else {
-            userLocation = String.format("(%s)%s: %s, %s", location.getCountryCode(), locale.getDisplayCountry(), location.getRegion(), location.getCity());
+            userLocation = String.format("[%s]%s: %s, %s", location.getCountryCode(), locale.getDisplayCountry(), location.getRegion(), location.getCity());
         }
 
         // Create detailed error message
