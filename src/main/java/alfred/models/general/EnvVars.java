@@ -7,6 +7,7 @@ public class EnvVars {
     private final String WEBSITE_URL;
     private final String CONTACT_EMAIL;
     private final String IPIFY_TOKEN;
+    private final String SLACK_SIGNING_SECRET;
 
     public EnvVars() {
         SLACK_TOKEN = System.getenv("SLACK-BOT-TOKEN");
@@ -15,6 +16,7 @@ public class EnvVars {
         WEBSITE_URL = System.getenv("WEBSITE-URL");
         CONTACT_EMAIL = System.getenv("CONTACT-EMAIL");
         IPIFY_TOKEN = System.getenv("IPIFY-TOKEN");
+        SLACK_SIGNING_SECRET = System.getenv("SLACK-SIGNING-SECRET");
     }
 
     public String getChannelGeneral() {
@@ -39,5 +41,9 @@ public class EnvVars {
 
     public String getIpifyToken() {
         return IPIFY_TOKEN;
+    }
+
+    public String getSlackSigningSecret() {
+        return SLACK_SIGNING_SECRET;
     }
 }

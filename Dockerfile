@@ -21,6 +21,7 @@ ENV WEBSITE-NAME=""
 ENV WEBSITE-URL=""
 ENV CONTACT_EMAIL=""
 ENV IPIFY-TOKEN=""
+ENV SLACK-SIGNING-SECRET=""
 
 # Run the .jar file fancy
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]

@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
@@ -52,6 +49,8 @@ public class SlashCommands {
 
     @PostMapping(value = "/api/slack/slashcommands")
     public ResponseEntity<String> slashCommandsPOST(@RequestHeader("X-Slack-Signature") String xSlackHeader,
+                                                    @RequestHeader("X-Slack-Request-Timestamp") int timestamp,
+                                                    @RequestBody String body,
                                                     @RequestParam("channel_id") String channelID,
                                                     @RequestParam("command") String command,
                                                     @RequestParam("text") String text,
@@ -61,6 +60,12 @@ public class SlashCommands {
 
         // Get environment variables
         EnvVars envVars = new EnvVars();
+
+        // TODO : remove later, for testing for now
+        System.out.println(timestamp + " " + xSlackHeader + " " + body + " " + envVars.getSlackSigningSecret());
+        System.out.println(new Date(timestamp).toString());
+        System.out.println(new Date().toString());
+
 
         // Remove all whitespace
         channelID = channelID.replaceAll("\\s+", "");
