@@ -3,6 +3,7 @@ import alfred.controllers.Event;
 import alfred.models.slack.EventRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Ignore
 @RunWith(SpringRunner.class)
 @WebMvcTest(Event.class)
 @ContextConfiguration(classes = {Main.class})
