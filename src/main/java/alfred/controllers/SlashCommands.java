@@ -14,13 +14,18 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,19 +59,38 @@ public class SlashCommands {
                                                     @RequestParam("channel_id") String channelID,
                                                     @RequestParam("command") String command,
                                                     @RequestParam("text") String text,
-                                                    HttpServletRequest httpServletRequest) {
+                                                    HttpServletRequest httpServletRequest) throws NoSuchAlgorithmException, InvalidKeyException {
 
         logger.log(Level.INFO, "POST request on {0}", httpServletRequest.getRequestURL());
 
         // Get environment variables
         EnvVars envVars = new EnvVars();
 
-        // TODO : remove later, for testing for now
-        System.out.println(timestamp + " " + xSlackHeader + " " + body + " " + envVars.getSlackSigningSecret());
-        System.out.println("Timestamp: " + timestamp + " | Actual timestamp: " + System.currentTimeMillis() + " | Timestamp * 1000: " + (timestamp * 1000));
-        System.out.println(new Date(timestamp * 1000).toString());
-        System.out.println(new Date().toString());
+        // Get relevant dates
+        Date slackDate = new Date(timestamp * 1000);
+        Date now = new Date();
 
+        long secondsGone = (now.getTime() - slackDate.getTime()) / 1000;
+
+        // Give error if request is older than 1min (60 seconds)
+        if (secondsGone > 60) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String temp = String.format("v0:%d:%s", timestamp, body);
+
+        Mac sha256HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(envVars.getSlackSigningSecret().getBytes(), "HmacSHA256");
+        sha256HMAC.init(secretKeySpec);
+
+        String hash = Hex.encodeHexString(sha256HMAC.doFinal(temp.getBytes()));
+
+        System.out.println("hash: " + hash);
+        System.out.println("slack-signature: " + xSlackHeader);
+
+        String mySignature = "v0=" + hash;
+
+        System.out.println("My signature: " + mySignature);
 
         // Remove all whitespace
         channelID = channelID.replaceAll("\\s+", "");
