@@ -23,6 +23,9 @@ public class Logs {
     @Column(name = "URL_SUFFIX")
     private String urlSuffix;
 
+    @Column(name = "USER_AGENT")
+    private String userAgent;
+
     @Column(name = "DATE")
     private String date;
 
@@ -30,11 +33,12 @@ public class Logs {
 
     }
 
-    public Logs(String userIp, int errorType, String urlSuffix, Date date) {
+    public Logs(String userIp, int errorType, String urlSuffix, String userAgent, Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss Z");
         this.userIp = userIp;
         this.errorType = errorType;
         this.urlSuffix = urlSuffix;
+        this.userAgent = userAgent;
         this.date = dateFormat.format(date);
     }
 
@@ -52,6 +56,10 @@ public class Logs {
 
     public String getUrlSuffix() {
         return urlSuffix;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
     }
 
     public String getDate() {

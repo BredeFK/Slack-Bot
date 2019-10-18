@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,7 +44,8 @@ public class ErrorHandler implements ErrorController {
     @RequestMapping(PATH)
     public ResponseEntity<String> error(HttpServletRequest httpServletRequest,
                                         @RequestAttribute(RequestDispatcher.ERROR_STATUS_CODE) Integer statusCode,
-                                        @RequestAttribute(RequestDispatcher.ERROR_REQUEST_URI) String path) throws IOException, UnirestException, InterruptedException {
+                                        @RequestAttribute(RequestDispatcher.ERROR_REQUEST_URI) String path,
+                                        @RequestHeader("User-Agent") String userAgent) throws IOException, UnirestException, InterruptedException {
 
         // Get status code
         HttpStatus status = HttpStatus.valueOf(statusCode);
@@ -53,7 +55,6 @@ public class ErrorHandler implements ErrorController {
 
 
         int nuberOfTriesToday = (1 + logsService.getNumberOfTodaysErrorsByIp(ip));
-        System.out.println(nuberOfTriesToday);
         // Sleep for 1min if it has been more than 15 request on the same day from the same user
         if (nuberOfTriesToday > 15) {
             logger.warning("Request has reached more than 15 from one use on one day. Sleeping for 1min...");
@@ -77,7 +78,7 @@ public class ErrorHandler implements ErrorController {
             ipInfoService.add(iPinfo);
         }
 
-        logsService.add(new Logs(ip, statusCode, path, new Date()));
+        logsService.add(new Logs(ip, statusCode, path, userAgent, new Date()));
 
 
         // Get country name from code
@@ -93,7 +94,7 @@ public class ErrorHandler implements ErrorController {
         }
 
         // Create detailed error message
-        String logMessage = String.format("%s (%s) | Error: %d - %s | Url suffix: %s ", userLocation, ip, statusCode, status.getReasonPhrase(), path);
+        String logMessage = String.format("%s (%s) | Error: %d - %s | Url suffix: %s | User-Agent: %s", userLocation, ip, statusCode, status.getReasonPhrase(), path, userAgent);
 
         // Log event
         logger.log(Level.WARNING, logMessage);
