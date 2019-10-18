@@ -3,7 +3,9 @@ package alfred.controllers;
 import alfred.models.general.EnvVars;
 import alfred.models.ipify.IPInfo;
 import alfred.models.ipify.Location;
+import alfred.models.logs.Logs;
 import alfred.services.IPInfoService;
+import alfred.services.LogsService;
 import com.google.gson.GsonBuilder;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,10 +37,13 @@ public class ErrorHandler implements ErrorController {
     @Autowired
     private IPInfoService ipInfoService;
 
+    @Autowired
+    private LogsService logsService;
+
     @RequestMapping(PATH)
     public ResponseEntity<String> error(HttpServletRequest httpServletRequest,
                                         @RequestAttribute(RequestDispatcher.ERROR_STATUS_CODE) Integer statusCode,
-                                        @RequestAttribute(RequestDispatcher.ERROR_REQUEST_URI) String path) throws IOException, UnirestException {
+                                        @RequestAttribute(RequestDispatcher.ERROR_REQUEST_URI) String path) throws IOException, UnirestException, InterruptedException {
 
         // Get status code
         HttpStatus status = HttpStatus.valueOf(statusCode);
@@ -45,7 +51,17 @@ public class ErrorHandler implements ErrorController {
         // Get users IP address
         String ip = httpServletRequest.getRemoteAddr();
 
-        // Init location
+
+        int nuberOfTriesToday = (1 + logsService.getNumberOfTodaysErrorsByIp(ip));
+        System.out.println(nuberOfTriesToday);
+        // Sleep for 1min if it has been more than 15 request on the same day from the same user
+        if (nuberOfTriesToday > 15) {
+            logger.warning("Request has reached more than 15 from one use on one day. Sleeping for 1min...");
+            Thread.sleep(60 * 1000);
+        }
+
+
+        // Init location and log
         IPInfo iPinfo;
 
         // Get location info if possible, below is for testing on localhost
@@ -60,6 +76,9 @@ public class ErrorHandler implements ErrorController {
             iPinfo = getInfoFromIP(ip);
             ipInfoService.add(iPinfo);
         }
+
+        logsService.add(new Logs(ip, statusCode, path, new Date()));
+
 
         // Get country name from code
         Location location = iPinfo.getLocation();
