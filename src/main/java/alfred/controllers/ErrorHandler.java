@@ -11,6 +11,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpHeaders;
@@ -74,7 +75,14 @@ public class ErrorHandler implements ErrorController {
         } else {
             // Ip is not from testing or in db, get ip info and add to db
 
-            iPinfo = getInfoFromIP(ip);
+            try {
+                iPinfo = getInfoFromIP(ip);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, e.getMessage());
+                return new ResponseEntity<>(
+                        HttpStatus.INTERNAL_SERVER_ERROR
+                );
+            }
             ipInfoService.add(iPinfo);
         }
 
@@ -118,7 +126,7 @@ public class ErrorHandler implements ErrorController {
     }
 
     // Returns information about ip address from Ip address
-    private IPInfo getInfoFromIP(String IP) throws UnirestException {
+    private IPInfo getInfoFromIP(String IP) throws Exception {
         String url = String.format("https://geo.ipify.org/api/v1?apiKey=%s&ipAddress=%s", envVars.getIpifyToken(), IP);
         HttpResponse<JsonNode> response = null;
 
@@ -127,6 +135,12 @@ public class ErrorHandler implements ErrorController {
         response = Unirest.get(url)
                 .header("accept", "application/json")
                 .asJson();
+
+        if (response.getBody().toString().contains("code")) {
+            JSONObject jsonObject = new JSONObject(response.getBody().toString());
+            String msg = String.format("Error Code %s \"%s\" (%s)", jsonObject.get("code"), jsonObject.get("messages"), IP);
+            throw new Exception(msg);
+        }
 
         // Convert from json to class
         return new GsonBuilder().create().fromJson(String.valueOf(response.getBody()), IPInfo.class);
